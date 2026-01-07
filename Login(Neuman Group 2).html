@@ -1,20 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<style>
-body {
-  background-image: url('https://static.vecteezy.com/system/resources/previews/010/008/086/non_2x/background-dimension-3d-graphic-message-board-for-text-and-message-design-line-shadow-for-modern-web-design-free-vector.jpg');
-  background-repeat: no-repeat;
-  background-position: center center;
-  background-size: cover;
-}
-</style>
-</head>
-<body>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Login Page</title>
+  <title>Login / Signup Page</title>
   <style>
+    /* Page background */
     body {
       font-family: Arial, sans-serif;
       background-color: #f2f2f2;
@@ -22,106 +13,334 @@ body {
       justify-content: center;
       align-items: center;
       height: 100vh;
+      margin: 0;
     }
 
-    .login-container {
+    /* Container */
+    .auth-container {
       background-color: white;
       padding: 40px 30px;
       border-radius: 8px;
       box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      width: 300px;
+      width: 360px;
     }
 
-    .login-container h2 {
+    h2 {
       text-align: center;
-      margin-bottom: 25px;
+      margin-bottom: 20px;
     }
 
-    .login-container input[type="text"],
-    .login-container input[type="password"] {
-      width: 100%;
-      padding: 12px;
-      margin: 8px 0 16px 0;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-    }
-
-
-     .login-container label {
+    label {
       display: block;
       margin-bottom: 5px;
-      font-weight: Bold;
+      font-weight: bold;
       color: #333;
-     }
+    }
 
-    .login-container input[type="submit"] {
+    input[type="text"],
+    input[type="password"] {
+      width: 100%;
+      padding: 10px;
+      margin: 6px 0 14px 0;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+
+    input[type="submit"], .toggle-btn, .debug-btn {
       width: 100%;
       background-color: #4CAF50;
       color: white;
-      padding: 12px;
+      padding: 10px;
       border: none;
       border-radius: 4px;
       cursor: pointer;
+      font-size: 1em;
+      margin-top: 6px;
     }
 
-    .login-container input[type="submit"]:hover {
+    input[type="submit"]:hover, .toggle-btn:hover, .debug-btn:hover {
       background-color: #45a049;
     }
 
-    .login-container p {
+    .small {
       text-align: center;
       font-size: 0.9em;
       color: #666;
+      margin-top: 10px;
+    }
+
+    .link {
+      color: #007bff;
+      cursor: pointer;
+      text-decoration: underline;
     }
 
     #message {
       text-align: center;
       margin-top: 10px;
+      font-size: 0.95em;
+    }
+
+    /* Hidden by default - used to switch between forms */
+    .hidden {
+      display: none;
+    }
+
+    .field-error {
+      color: #b00020;
       font-size: 0.9em;
+      margin-top: -10px;
+      margin-bottom: 10px;
+    }
+
+    /* Saved accounts debug list */
+    #savedAccounts {
+      margin-top: 12px;
+      padding: 8px;
+      border: 1px dashed #ccc;
+      border-radius: 6px;
+      font-size: 0.9em;
+      color: #333;
+      background: #fafafa;
+    }
+
+    .muted {
+      color: #666;
+      font-size: 0.85em;
     }
   </style>
 </head>
 <body>
 
-  <div class="login-container">
-    <h2>Login</h2>
-    <form id="loginForm">
-      <label for="username">Username</label>
-      <input type="text" id="username" name="username" placeholder="Enter your username" required>
+  <div class="auth-container">
+    <div id="loginPanel">
+      <h2>Login</h2>
+      <form id="loginForm">
+        <label for="loginUsername">Username</label>
+        <input type="text" id="loginUsername" name="username" placeholder="Enter your username" required>
 
-      <label for="password">Password</label>
-       <input type="password" id="password" name="password" placeholder="Enter your password" required>
+        <label for="loginPassword">Password</label>
+        <input type="password" id="loginPassword" name="password" placeholder="Enter your password" required>
 
-      <input type="submit" value="Login">
-    </form>
-    <p id="message"></p>
-    <p>Don't have an account?</p>
-    <p><a href="#">Sign up</a></p>
+        <input type="submit" value="Login">
+      </form>
+      <p id="loginMessage" class="small" aria-live="polite"></p>
+      <p class="small">Don't have an account? <span id="showSignup" class="link">Sign up</span></p>
+    </div>
+
+    <div id="signupPanel" class="hidden">
+      <h2>Sign up</h2>
+      <form id="signupForm">
+        <label for="signupUsername">Username</label>
+        <input type="text" id="signupUsername" name="username" placeholder="Pick a username" required>
+
+        <label for="signupPassword">Password</label>
+        <input type="password" id="signupPassword" name="password" placeholder="Choose a password (min 6 chars)" required>
+
+        <label for="signupConfirmPassword">Confirm Password</label>
+        <input type="password" id="signupConfirmPassword" name="confirmPassword" placeholder="Re-enter your password" required>
+
+        <div id="signupError" class="field-error" aria-live="polite"></div>
+
+        <input type="submit" value="Create account">
+      </form>
+      <p id="signupMessage" class="small" aria-live="polite"></p>
+      <p class="small">Already have an account? <span id="showLogin" class="link">Login</span></p>
+    </div>
+
+    <button id="toggleSavedBtn" class="debug-btn">Show saved accounts (dev)</button>
+    <div id="savedAccounts" class="hidden" aria-live="polite"></div>
+
+    <div id="message" aria-live="polite"></div>
   </div>
 
   <script>
-    const form = document.getElementById("loginForm");
-    const messageElement = document.getElementById("message");
+    // Utility: hash a password using SHA-256 and return hex string
+    async function hashPassword(password) {
+      const enc = new TextEncoder();
+      const data = enc.encode(password);
+      const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    }
 
-    form.addEventListener("submit", function(event) {
-      event.preventDefault(); // Stops page from reloading
+    // Users are stored in localStorage under key 'users' as JSON object: { username: passwordHash, ... }
+    function getStoredUsers() {
+      try {
+        const raw = localStorage.getItem('users');
+        return raw ? JSON.parse(raw) : {};
+      } catch (e) {
+        console.error('Failed to parse stored users', e);
+        return {};
+      }
+    }
 
-      const username = document.getElementById("username").value;
-      const password = document.getElementById("password").value;
+    function saveStoredUsers(users) {
+      localStorage.setItem('users', JSON.stringify(users));
+    }
 
-      if (username === "admin" && password === "mySecret123") {
-        messageElement.textContent = "Login successful!";
-        messageElement.style.color = "green";
+    // UI elements
+    const loginPanel = document.getElementById('loginPanel');
+    const signupPanel = document.getElementById('signupPanel');
+    const showSignup = document.getElementById('showSignup');
+    const showLogin = document.getElementById('showLogin');
+    const loginForm = document.getElementById('loginForm');
+    const signupForm = document.getElementById('signupForm');
+    const loginMessage = document.getElementById('loginMessage');
+    const signupMessage = document.getElementById('signupMessage');
+    const signupError = document.getElementById('signupError');
+    const savedAccountsDiv = document.getElementById('savedAccounts');
+    const toggleSavedBtn = document.getElementById('toggleSavedBtn');
 
-        setTimeout(() => {
-          window.location.href = "file:///C:/Users/PC/Documents/Homepage(Neuman%20Group%202).html";
-        }, 1000);
+    // Toggle panels
+    showSignup.addEventListener('click', () => {
+      loginPanel.classList.add('hidden');
+      signupPanel.classList.remove('hidden');
+      loginMessage.textContent = '';
+      signupMessage.textContent = '';
+      signupError.textContent = '';
+      signupForm.reset();
+    });
+
+    showLogin.addEventListener('click', () => {
+      signupPanel.classList.add('hidden');
+      loginPanel.classList.remove('hidden');
+      loginForm.reset();
+      signupMessage.textContent = '';
+      loginMessage.textContent = '';
+      signupError.textContent = '';
+    });
+
+    // Toggle saved accounts debug display
+    toggleSavedBtn.addEventListener('click', () => {
+      if (savedAccountsDiv.classList.contains('hidden')) {
+        updateSavedAccountsDisplay();
+        savedAccountsDiv.classList.remove('hidden');
+        toggleSavedBtn.textContent = 'Hide saved accounts (dev)';
       } else {
-        messageElement.textContent = "Incorrect username or password.";
-        messageElement.style.color = "red";
+        savedAccountsDiv.classList.add('hidden');
+        toggleSavedBtn.textContent = 'Show saved accounts (dev)';
       }
     });
-  </script>
 
+    function updateSavedAccountsDisplay() {
+      const users = getStoredUsers();
+      const keys = Object.keys(users);
+      if (keys.length === 0) {
+        savedAccountsDiv.innerHTML = '<div class="muted">No saved accounts found in localStorage.</div>';
+        return;
+      }
+      // Show usernames only for quick verification (do not expose hashed passwords here)
+      savedAccountsDiv.innerHTML = '<strong>Saved usernames:</strong><br>' + keys.map(u => '- ' + escapeHtml(u)).join('<br>');
+    }
+
+    // Simple escape for displayed usernames
+    function escapeHtml(s) {
+      return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
+    // Signup handler
+    signupForm.addEventListener('submit', async function(event) {
+      event.preventDefault();
+      signupError.textContent = '';
+      signupMessage.textContent = '';
+
+      const username = document.getElementById('signupUsername').value.trim();
+      const password = document.getElementById('signupPassword').value;
+      const confirm = document.getElementById('signupConfirmPassword').value;
+
+      if (!username) {
+        signupError.textContent = 'Username cannot be empty.';
+        return;
+      }
+      if (password.length < 6) {
+        signupError.textContent = 'Password must be at least 6 characters.';
+        return;
+      }
+      if (password !== confirm) {
+        signupError.textContent = 'Passwords do not match. Please re-enter.';
+        return;
+      }
+
+      const users = getStoredUsers();
+      if (users.hasOwnProperty(username)) {
+        signupError.textContent = 'Username already taken. Please choose another.';
+        return;
+      }
+
+      try {
+        const hashed = await hashPassword(password);
+        users[username] = hashed;
+        saveStoredUsers(users);
+
+        // Verification: re-read and ensure saved
+        const recheck = getStoredUsers();
+        if (recheck[username] && recheck[username] === hashed) {
+          signupMessage.style.color = 'green';
+          signupMessage.textContent = 'Account created successfully. You may now log in.';
+          console.info('Signup saved successfully for user:', username);
+          updateSavedAccountsDisplay();
+          // Switch back to login after a short delay
+          setTimeout(() => {
+            signupPanel.classList.add('hidden');
+            loginPanel.classList.remove('hidden');
+            signupForm.reset();
+            signupMessage.textContent = '';
+          }, 900);
+        } else {
+          // Something went wrong saving
+          signupMessage.style.color = 'red';
+          signupMessage.textContent = 'An error occurred saving the account. Please try again.';
+          console.error('Re-check failed after saving user:', username, 'stored object:', recheck);
+        }
+      } catch (err) {
+        console.error(err);
+        signupMessage.style.color = 'red';
+        signupMessage.textContent = 'An error occurred creating the account.';
+      }
+    });
+
+    // Login handler
+    loginForm.addEventListener('submit', async function(event) {
+      event.preventDefault();
+      loginMessage.textContent = '';
+
+      const username = document.getElementById('loginUsername').value.trim();
+      const password = document.getElementById('loginPassword').value;
+
+      const users = getStoredUsers();
+      if (!users.hasOwnProperty(username)) {
+        loginMessage.style.color = 'red';
+        loginMessage.textContent = 'Incorrect username or password.';
+        return;
+      }
+
+      try {
+        const hashed = await hashPassword(password);
+        if (users[username] === hashed) {
+          loginMessage.style.color = 'green';
+          loginMessage.textContent = 'Login successful! Redirecting...';
+          // Redirect to homepage in same folder (change filename if different)
+          setTimeout(() => {
+            window.location.href = "Homepage(Neuman Group 2).html";
+          }, 900);
+        } else {
+          loginMessage.style.color = 'red';
+          loginMessage.textContent = 'Incorrect username or password.';
+        }
+      } catch (err) {
+        console.error(err);
+        loginMessage.style.color = 'red';
+        loginMessage.textContent = 'An error occurred during login.';
+      }
+    });
+
+    // (Optional) On load, update saved accounts display (hidden by default)
+    document.addEventListener('DOMContentLoaded', () => {
+      // If you want the saved accounts visible immediately for testing, remove the .hidden toggle above
+      updateSavedAccountsDisplay();
+    });
+  </script>
 </body>
 </html>
