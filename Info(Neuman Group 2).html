@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Information - Schedule Planner</title>
+
+  <style>
+    body {
+      background-image: url("https://static.vecteezy.com/system/resources/previews/010/008/086/non_2x/background-dimension-3d-graphic-message-board-for-text-and-message-design-line-shadow-for-modern-web-design-free-vector.jpg");
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-position: top;
+      color: black;
+      text-align: center;
+      padding-top: 100px;
+      font-family: Arial, sans-serif;
+    }
+
+    .container {
+      background-color: rgba(255, 255, 255, 0.9);
+      margin: 50px auto;
+      padding: 30px;
+      width: 80%;
+      border-radius: 12px;
+      text-align: left;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+
+    h1, h2 {
+      font-family: Algerian, serif;
+      color: orange;
+      text-align: center;
+    }
+
+    img {
+      width: 150px;
+      height: 120px;
+      display: block;
+      margin: 0 auto 25px;
+    }
+
+    ul {
+      list-style-type: disc;
+      margin-left: 40px;
+      line-height: 1.6;
+    }
+
+    .button-container {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 30px;
+    }
+
+    .nav-button {
+      background-color: orange;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: 0.3s;
+    }
+
+    .nav-button:hover {
+      background-color: #d68500;
+    }
+
+    .section {
+      display: none;
+    }
+
+    .active {
+      display: block;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <!-- Image -->
+    <img src="https://cdn-icons-png.flaticon.com/512/1827/1827504.png" alt="Schedule Planner Icon" />
+
+    <!-- SECTION 1 -->
+    <div class="section active" id="section-1">
+      <h1>WHAT IS THE TOPIC ABOUT</h1>
+      <ul>
+        <li>The topic focuses on the effectiveness of a web-based schedule planner for student time management.</li>
+        <li>A schedule planner organizes and allocates time for specific tasks or subjects.</li>
+        <li>Examples: Google Calendar, Notion, Trello, MyStudyLife.</li>
+        <li>Features include reminders, color coding, time blocking, and integration tools.</li>
+        <li>Helps improve prioritization, routine, and productivity.</li>
+      </ul>
+    </div>
+
+    <!-- SECTION 2 -->
+    <div class="section" id="section-2">
+      <h2>MAIN TOPIC</h2>
+      <ul>
+        <li><strong>Definition:</strong> A system used to organize time and manage tasks.</li>
+        <li><strong>Purpose:</strong> Improve time management, productivity, reduce stress, and track goals.</li>
+        <li><strong>Types:</strong> Manual planners, digital apps, academic planners, work planners.</li>
+        <li><strong>Key Features:</strong> Time blocking, reminders, sync, automatic updates.</li>
+        <li><strong>Benefits:</strong> Routine building, focus enhancement, long-term planning, work-life balance.</li>
+      </ul>
+    </div>
+
+    <!-- SECTION 3 -->
+    <div class="section" id="section-3">
+      <h2>KEY FOCUS</h2>
+      <ul>
+        <li>Online accessibility for task management.</li>
+        <li>Prioritization methods: Eisenhower Matrix, ABC analysis.</li>
+        <li>Multiple views: daily, weekly, monthly.</li>
+        <li>Integration with other productivity tools.</li>
+        <li>User-friendly and customizable interface.</li>
+      </ul>
+    </div>
+
+    <!-- SECTION 4 -->
+    <div class="section" id="section-4">
+      <h2>CORE OBJECTIVE</h2>
+      <ul>
+        <li>Measure whether the planner improves student time management.</li>
+        <li>Reduce procrastination and increase productivity.</li>
+        <li>Promote goal-oriented planning and decision-making.</li>
+        <li>Support balance between academic and personal life.</li>
+        <li>Provide visual scheduling and stress reduction tools.</li>
+      </ul>
+    </div>
+
+    <!-- Navigation Buttons -->
+    <div class="button-container">
+      <button class="nav-button" id="prev-btn" onclick="changeSection(-1)">← Previous</button>
+      <button class="nav-button" id="next-btn" onclick="changeSection(1)">Next →</button>
+    </div>
+
+  </div>
+
+  <script>
+    let currentSection = 1;
+    const totalSections = 4;
+
+    function showSection(index) {
+      for (let i = 1; i <= totalSections; i++) {
+        document.getElementById(`section-${i}`).classList.remove("active");
+      }
+      document.getElementById(`section-${index}`).classList.add("active");
+
+      updateButtons();
+    }
+
+    function changeSection(direction) {
+
+      // Last slide → Take user to HOME
+      if (currentSection === totalSections && direction === 1) {
+        window.location.href = "Homepage(Neuman Group 2).html";
+        return;
+      }
+
+      currentSection += direction;
+
+      if (currentSection < 1) currentSection = 1;
+      if (currentSection > totalSections) currentSection = totalSections;
+
+      showSection(currentSection);
+    }
+
+    function updateButtons() {
+      const nextBtn = document.getElementById("next-btn");
+
+      if (currentSection === totalSections) {
+        nextBtn.textContent = "Home";
+      } else {
+        nextBtn.textContent = "Next →";
+      }
+    }
+
+    updateButtons();
+  </script>
+
+</body>
+</html>

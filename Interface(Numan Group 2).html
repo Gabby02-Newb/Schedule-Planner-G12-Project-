@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Weekly Schedule Planner</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+/* Global */
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #FFFFFF;
+  color: #000000;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+}
+html, body { height: 100%; }
+
+/* Header */
+header {
+  background-color: #FFA500;
+  color: white;
+  padding: 25px;
+  text-align: center;
+  font-size: 22px;
+  position: relative;
+}
+header i { margin-right: 8px; }
+
+/* Home Button */
+#homeBtn {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  background-color: #FFB347;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+}
+#homeBtn:hover { background-color: #FF8C00; }
+
+/* Layout container */
+.container {
+  display: flex;
+  width: 100%;
+  margin: 20px auto;
+  max-width: 1400px;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 250px;
+  background-color: #FFA500;
+  color: white;
+  padding: 25px;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+.sidebar h3 { margin-top: 0; font-size: 20px; }
+
+.day-button {
+  background-color: #FFB347;
+  color: white;
+  padding: 12px;
+  margin: 8px 0;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 17px;
+  text-align: left;
+  width: 100%;
+}
+.day-button:hover { background-color: #FF8C00; }
+
+/* Main content */
+.main-content { flex-grow: 1; margin-left: 15px; }
+.main-content h2 { color: #FF8C00; font-size: 22px; }
+
+/* Form styling */
+.form-group { margin-bottom: 15px; width: auto; }
+label { font-weight: bold; display: block; }
+input[type="time"], input[type="text"], select {
+  width: 100%;
+  padding: 12px;
+  margin-top: 5px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
+}
+
+/* Buttons */
+button {
+  background-color: #FFA500;
+  color: white;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  width: 100%;
+  font-size: 17px;
+}
+button:hover { background-color: #FF8C00; }
+
+/* Schedule items */
+.schedule-list { margin-top: 20px; }
+.schedule-item {
+  background-color: #fff8f0;
+  padding: 12px;
+  margin-bottom: 10px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Calendar Section */
+main {
+  flex: 1;
+  padding: 25px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  margin-top: 40px;
+}
+.calendar {
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  font-size: 17px;
+}
+.calendar-header {
+  background-color: #FFA500;
+  color: black;
+  padding: 15px;
+  text-align: center;
+}
+table { width: 100%; border-collapse: collapse; }
+th, td {
+  text-align: center;
+  padding: 12px;
+  border: 1px solid #ddd;
+}
+th { background-color: #fff3e0; font-weight: bold; }
+.today { background-color: #ffffcc; font-weight: bold; }
+.empty { background-color: #f9f9f9; }
+.date-cell {
+  cursor: pointer;
+  background-color: #fff8e1;
+  transition: background-color 0.3s;
+}
+.date-cell:hover { background-color: #FFE4B5; }
+
+/* Modal */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0; top: 0;
+  width: 100%; height: 100%;
+  background-color: rgba(0,0,0,0.4);
+}
+.modal-content {
+  background-color: black;
+  margin: 10% auto;
+  padding: 20px;
+  border-radius: 10px;
+  width: 400px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  cursor: pointer;
+}
+.close:hover { color: white; }
+</style>
+</head>
+
+<body>
+<header>
+  <button id="homeBtn" onclick="window.location.href='Homepage(Neuman Group 2).html'">Home</button>
+  <h1><i class="fa-solid fa-calendar-check"></i> Weekly Schedule Planner</h1>
+</header>
+
+<div class="container">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <h3>Select a Day</h3>
+    <button class="day-button" data-day="monday">Monday</button>
+    <button class="day-button" data-day="tuesday">Tuesday</button>
+    <button class="day-button" data-day="wednesday">Wednesday</button>
+    <button class="day-button" data-day="thursday">Thursday</button>
+    <button class="day-button" data-day="friday">Friday</button>
+    <button class="day-button" data-day="saturday">Saturday</button>
+    <button class="day-button" data-day="sunday">Sunday</button>
+    
+    <div class="month-selector">
+      <h3>Select Month</h3>
+      <select id="monthSelect">
+        <option value="0">January</option>
+        <option value="1">February</option>
+        <option value="2">March</option>
+        <option value="3">April</option>
+        <option value="4">May</option>
+        <option value="5">June</option>
+        <option value="6">July</option>
+        <option value="7">August</option>
+        <option value="8">September</option>
+        <option value="9" selected>October</option>
+        <option value="10">November</option>
+        <option value="11">December</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Main content -->
+  <div class="main-content">
+    <h2>Add Task for <span id="current-day">Monday</span></h2>
+
+    <form id="schedule-form">
+      <div class="form-group">
+        <label>Start Time</label>
+        <input type="time" id="task-start-time" required>
+      </div>
+      <div class="form-group">
+        <label>End Time</label>
+        <input type="time" id="task-end-time" required>
+      </div>
+      <div class="form-group">
+        <label>Task Description</label>
+        <input type="text" id="task-description" placeholder="What do you need to do?" required>
+      </div>
+      <div class="form-group">
+        <label>Priority</label>
+        <select id="task-priority" required>
+          <option value="high">High</option>
+          <option value="medium">Medium</option>
+          <option value="low">Low</option>
+        </select>
+      </div>
+      <button type="submit">Add Task</button>
+    </form>
+
+    <div class="schedule-list">
+      <h3>Tasks for <span id="tasks-day">Monday</span></h3>
+      <div id="schedule-container"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Calendar Section -->
+<main>
+  <div class="calendar">
+    <div class="calendar-header">
+      <h2>October 2026</h2>
+    </div>
+    <table id="calendarTable">
+      <thead>
+        <tr>
+          <th>Sun</th><th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</main>
+
+<!-- Modal -->
+<div id="taskModal" class="modal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2 id="modalTitle">Add Task</h2>
+    <form id="taskForm">
+      <div class="form-group">
+        <label for="taskTitle">Task Title</label>
+        <input type="text" id="taskTitle" required>
+      </div>
+      <div class="form-group">
+        <label for="taskDescription">Description</label>
+        <input type="text" id="taskDescription" required>
+      </div>
+      <button type="submit">Save Task</button>
+      <button type="button" id="cancelBtn">Cancel</button>
+    </form>
+  </div>
+</div>
+
+<script>
+// --------- WEEKLY TASKS ---------
+const days = { monday: [], tuesday: [], wednesday: [], thursday: [], friday: [], saturday: [], sunday: [] };
+const scheduleContainer = document.getElementById("schedule-container");
+const currentDayText = document.getElementById("current-day");
+const tasksDayText = document.getElementById("tasks-day");
+
+document.querySelectorAll(".day-button").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const day = btn.dataset.day;
+    currentDayText.textContent = capitalize(day);
+    tasksDayText.textContent = capitalize(day);
+    updateTaskList(day);
+  });
+});
+
+function updateTaskList(day) {
+  scheduleContainer.innerHTML = "";
+  days[day].forEach(task => {
+    scheduleContainer.innerHTML += `
+      <div class="schedule-item">
+        <p><strong>${task.start} - ${task.end}</strong></p>
+        <p>${task.description}</p>
+        <p>Priority: ${capitalize(task.priority)}</p>
+      </div>`;
+  });
+}
+
+document.getElementById("schedule-form").addEventListener("submit", e => {
+  e.preventDefault();
+  const startTime = document.getElementById("task-start-time").value;
+  const endTime = document.getElementById("task-end-time").value;
+  const description = document.getElementById("task-description").value;
+  const priority = document.getElementById("task-priority").value;
+  const day = currentDayText.textContent.toLowerCase();
+  days[day].push({ start: startTime, end: endTime, description, priority });
+  updateTaskList(day);
+  e.target.reset();
+});
+
+function capitalize(str) { return str.charAt(0).toUpperCase() + str.slice(1); }
+
+// --------- CALENDAR ---------
+const modal = document.getElementById("taskModal");
+const modalTitle = document.getElementById("modalTitle");
+const taskForm = document.getElementById("taskForm");
+const closeBtn = document.getElementsByClassName("close")[0];
+const cancelBtn = document.getElementById("cancelBtn");
+const monthSelect = document.getElementById("monthSelect");
+const calendarHeader = document.querySelector(".calendar-header h2");
+const calendarTable = document.getElementById("calendarTable");
+
+let selectedDate = '';
+let currentYear = 2025;
+
+function buildCalendar(month) {
+  const year = currentYear;
+  const monthName = monthSelect.options[month].text;
+  calendarHeader.textContent = `${monthName} ${year}`;
+  const firstDay = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month+1, 0).getDate();
+  const tbody = calendarTable.querySelector("tbody");
+  tbody.innerHTML = '';
+  let date = 1;
+  for(let i=0;i<6;i++){
+    const row = document.createElement("tr");
+    for(let j=0;j<7;j++){
+      const cell = document.createElement("td");
+      if((i===0 && j<firstDay) || date>daysInMonth){
+        cell.classList.add("empty");
+      } else {
+        cell.classList.add("date-cell");
+        cell.textContent = date;
+        date++;
+      }
+      row.appendChild(cell);
+    }
+    tbody.appendChild(row);
+  }
+}
+
+monthSelect.addEventListener("change", e => buildCalendar(parseInt(e.target.value)));
+
+calendarTable.addEventListener("click", e => {
+  if(e.target.classList.contains("date-cell")){
+    selectedDate = e.target.textContent;
+    modalTitle.textContent = `Add Task for ${calendarHeader.textContent} ${selectedDate}`;
+    modal.style.display = "block";
+  }
+});
+
+closeBtn.onclick = cancelBtn.onclick = () => modal.style.display = "none";
+window.onclick = e => { if(e.target===modal) modal.style.display="none"; };
+
+taskForm.addEventListener("submit", e=>{
+  e.preventDefault();
+  const title = document.getElementById("taskTitle").value;
+  const allCells = calendarTable.querySelectorAll(".date-cell");
+  allCells.forEach(cell => {
+    if(parseInt(cell.textContent) === parseInt(selectedDate)){
+      const span = document.createElement("div");
+      span.style.fontSize="12px";
+      span.style.marginTop="5px";
+      span.style.background="#FFA500";
+      span.style.color="white";
+      span.style.borderRadius="4px";
+      span.textContent = title;
+      cell.appendChild(span);
+    }
+  });
+  taskForm.reset();
+  modal.style.display="none";
+});
+
+// Initialize
+buildCalendar(9); // October
+updateTaskList("monday");
+</script>
+</body>
+</html>

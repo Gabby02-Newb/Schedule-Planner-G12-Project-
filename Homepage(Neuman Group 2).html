@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Home - Schedule Planner</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-image: url('https://static.vecteezy.com/system/resources/previews/010/008/086/non_2x/background-dimension-3d-graphic-message-board-for-text-and-message-design-line-shadow-for-modern-web-design-free-vector.jpg');
+      background-repeat: no-repeat;
+      background-position: center center;
+      background-size: cover;
+      color: white;
+      text-align: center;
+      height: 100vh;
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .container {
+      background-color: rgba(0, 0, 0, 0.7);
+      padding: 50px;
+      border-radius: 10px;
+      width: 60%;
+    }
+
+    h1 {
+      font-family: Algerian, serif;
+      color: white;
+      margin-bottom: 20px;
+    }
+
+    .button-container {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    .nav-button {
+      background-color: orange;
+      color: white;
+      border: none;
+      padding: 20px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 18px;
+      transition: background-color 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+
+    .nav-button:hover {
+      background-color: orange;
+    }
+
+    .nav-button i {
+      margin-right: 10px;
+    }
+
+    .nav-button p {
+      margin: 0;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Welcome to Your Schedule Planner</h1>
+    <div class="button-container">
+
+      <!-- Button to Guide -->
+      <button class="nav-button" onclick="window.location.href='Guide(Neuman Group 2).html'">
+        <i class="fas fa-book-open"></i>
+        <p>Guide</p>
+      </button>
+
+<!-- Button to Schedule Planner -->
+<button class="nav-button" onclick="window.location.href='Interface(Numan Group 2).html'">
+  <i class="fas fa-calendar-alt"></i>
+  <p>Schedule Planner</p>
+</button>
+
+<!-- Button to Information -->
+<button class="nav-button" onclick="window.location.href='Info(Neuman Group 2).html'">
+  <i class="fas fa-info-circle"></i>
+  <p>Information</p>
+</button>
+
+    </div>
+  </div>
+</body>
+</html>

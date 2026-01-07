@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<style>
+body {
+  background-image: url('https://static.vecteezy.com/system/resources/previews/010/008/086/non_2x/background-dimension-3d-graphic-message-board-for-text-and-message-design-line-shadow-for-modern-web-design-free-vector.jpg');
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: cover;
+}
+</style>
+</head>
+<body>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Login Page</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f2f2f2;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .login-container {
+      background-color: white;
+      padding: 40px 30px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      width: 300px;
+    }
+
+    .login-container h2 {
+      text-align: center;
+      margin-bottom: 25px;
+    }
+
+    .login-container input[type="text"],
+    .login-container input[type="password"] {
+      width: 100%;
+      padding: 12px;
+      margin: 8px 0 16px 0;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+
+     .login-container label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: Bold;
+      color: #333;
+     }
+
+    .login-container input[type="submit"] {
+      width: 100%;
+      background-color: #4CAF50;
+      color: white;
+      padding: 12px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .login-container input[type="submit"]:hover {
+      background-color: #45a049;
+    }
+
+    .login-container p {
+      text-align: center;
+      font-size: 0.9em;
+      color: #666;
+    }
+
+    #message {
+      text-align: center;
+      margin-top: 10px;
+      font-size: 0.9em;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="login-container">
+    <h2>Login</h2>
+    <form id="loginForm">
+      <label for="username">Username</label>
+      <input type="text" id="username" name="username" placeholder="Enter your username" required>
+
+      <label for="password">Password</label>
+       <input type="password" id="password" name="password" placeholder="Enter your password" required>
+
+      <input type="submit" value="Login">
+    </form>
+    <p id="message"></p>
+    <p>Don't have an account?</p>
+    <p><a href="#">Sign up</a></p>
+  </div>
+
+  <script>
+    const form = document.getElementById("loginForm");
+    const messageElement = document.getElementById("message");
+
+    form.addEventListener("submit", function(event) {
+      event.preventDefault(); // Stops page from reloading
+
+      const username = document.getElementById("username").value;
+      const password = document.getElementById("password").value;
+
+      if (username === "admin" && password === "mySecret123") {
+        messageElement.textContent = "Login successful!";
+        messageElement.style.color = "green";
+
+        setTimeout(() => {
+          window.location.href = "file:///C:/Users/PC/Documents/Homepage(Neuman%20Group%202).html";
+        }, 1000);
+      } else {
+        messageElement.textContent = "Incorrect username or password.";
+        messageElement.style.color = "red";
+      }
+    });
+  </script>
+
+</body>
+</html>
