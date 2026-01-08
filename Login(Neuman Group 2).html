@@ -149,7 +149,7 @@
       <p class="small">Already have an account? <span id="showLogin" class="link">Login</span></p>
     </div>
 
-    <button id="toggleSavedBtn" class="debug-btn">Show saved accounts (dev)</button>
+    <button id="toggleSavedBtn" class="debug-btn">Show saved accounts </button>
     <div id="savedAccounts" class="hidden" aria-live="polite"></div>
 
     <div id="message" aria-live="polite"></div>
@@ -217,7 +217,7 @@
       if (savedAccountsDiv.classList.contains('hidden')) {
         updateSavedAccountsDisplay();
         savedAccountsDiv.classList.remove('hidden');
-        toggleSavedBtn.textContent = 'Hide saved accounts (dev)';
+        toggleSavedBtn.textContent = 'Hide saved accounts ';
       } else {
         savedAccountsDiv.classList.add('hidden');
         toggleSavedBtn.textContent = 'Show saved accounts (dev)';
