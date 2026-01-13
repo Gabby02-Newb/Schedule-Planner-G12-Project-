@@ -115,6 +115,18 @@ button:hover { background-color: #FF8C00; }
   margin-bottom: 10px;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+}
+.schedule-item small {
+  display: inline-block;
+  margin-top: 6px;
+  color: #666;
+}
+
+/* acknowledged style (minimal visual change) */
+.schedule-item.ack {
+  opacity: 0.7;
+  text-decoration: line-through;
 }
 
 /* Calendar Section */
@@ -145,6 +157,7 @@ th, td {
   text-align: center;
   padding: 12px;
   border: 1px solid #ddd;
+  vertical-align: top;
 }
 th { background-color: #fff3e0; font-weight: bold; }
 .today { background-color: #ffffcc; font-weight: bold; }
@@ -153,10 +166,27 @@ th { background-color: #fff3e0; font-weight: bold; }
   cursor: pointer;
   background-color: #fff8e1;
   transition: background-color 0.3s;
+  position: relative;
+  min-height: 60px;
 }
 .date-cell:hover { background-color: #FFE4B5; }
 
-/* Modal */
+/* small badge for calendar tasks */
+.calendar-task {
+  font-size: 12px;
+  margin-top: 6px;
+  background: #FFA500;
+  color: white;
+  border-radius: 4px;
+  padding: 2px 6px;
+  display: inline-block;
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Modal (kept black background per original file) */
 .modal {
   display: none;
   position: fixed;
@@ -167,19 +197,61 @@ th { background-color: #fff3e0; font-weight: bold; }
 }
 .modal-content {
   background-color: black;
-  margin: 10% auto;
+  margin: 6% auto;
   padding: 20px;
   border-radius: 10px;
-  width: 400px;
+  width: 420px; /* slightly smaller scale for the calendar modal */
   box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  color: white;
 }
+/* Small aesthetic calendar inside modal */
+.small-cal {
+  background: linear-gradient(135deg, #ffffff, #ffffff);
+  color: #111827;
+  padding: 12px;
+  border-radius: 10px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+.small-cal .header {
+  display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;
+}
+.small-cal .header h3 { margin:0; font-size:1rem; color:#374151; }
+.small-cal .days, .small-cal .dates {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap:6px;
+  text-align:center;
+}
+.small-cal .days div { font-size:0.7rem; color:#6b7280; font-weight:600; }
+.small-cal .date {
+  padding:8px;
+  border-radius:8px;
+  cursor:pointer;
+  background:#fff8e1;
+  font-size:0.9rem;
+}
+.small-cal .date.today { outline:2px solid #6366f1; }
+.small-cal .date.selected { background:#eef2ff; font-weight:700; }
+.small-cal textarea {
+  width:100%; height:60px; margin-top:8px; padding:8px; border-radius:8px; border:1px solid #e5e7eb; resize:none;
+}
+.small-cal .small-save {
+  margin-top:8px; width:100%; padding:8px; border-radius:10px; border:none; background:linear-gradient(135deg,#22c55e,#4ade80); color:#fff; font-weight:600;
+}
+.small-cal .small-plans { margin-top:8px; max-height:160px; overflow:auto; color:#374151; }
+.small-cal .small-plan { background:#fff; padding:6px; border-radius:6px; margin-bottom:6px; display:flex; justify-content:space-between; align-items:center; font-size:0.85rem;}
+
+/* close button */
 .close {
   color: #aaa;
   float: right;
-  font-size: 28px;
+  font-size: 24px;
   cursor: pointer;
 }
 .close:hover { color: white; }
+
+/* small helper text */
+.modal .muted { color: #d1d5db; font-size:0.85rem; margin-top:8px; display:block; }
 </style>
 </head>
 
@@ -213,7 +285,7 @@ th { background-color: #fff3e0; font-weight: bold; }
         <option value="6">July</option>
         <option value="7">August</option>
         <option value="8">September</option>
-        <option value="9" selected>October</option>
+        <option value="9">October</option>
         <option value="10">November</option>
         <option value="11">December</option>
       </select>
@@ -245,21 +317,27 @@ th { background-color: #fff3e0; font-weight: bold; }
           <option value="low">Low</option>
         </select>
       </div>
+
+      <div class="form-group">
+        <label><input type="checkbox" id="task-oneTime" /> One-time (do not treat as recurring)</label>
+      </div>
+
       <button type="submit">Add Task</button>
     </form>
 
     <div class="schedule-list">
       <h3>Tasks for <span id="tasks-day">Monday</span></h3>
       <div id="schedule-container"></div>
+      <small style="display:block;margin-top:6px;color:#666">Click a task to acknowledge it and stop its notifications.</small>
     </div>
   </div>
 </div>
 
-<!-- Calendar Section -->
+<!-- Calendar Section (main) -->
 <main>
   <div class="calendar">
     <div class="calendar-header">
-      <h2>October 2026</h2>
+      <h2 id="calendarTitle">October 2026</h2>
     </div>
     <table id="calendarTable">
       <thead>
@@ -272,90 +350,203 @@ th { background-color: #fff3e0; font-weight: bold; }
   </div>
 </main>
 
-<!-- Modal -->
-<div id="taskModal" class="modal">
-  <div class="modal-content">
-    <span class="close">&times;</span>
-    <h2 id="modalTitle">Add Task</h2>
-    <form id="taskForm">
-      <div class="form-group">
-        <label for="taskTitle">Task Title</label>
-        <input type="text" id="taskTitle" required>
+<!-- Modal: small aesthetic calendar for adding date-specific tasks -->
+<div id="taskModal" class="modal" aria-hidden="true">
+  <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <span class="close" title="Close">&times;</span>
+
+    <div class="small-cal" id="smallCal">
+      <div class="header">
+        <button id="smallPrev" aria-label="Previous month">‹</button>
+        <h3 id="smallMonthYear">Month Year</h3>
+        <button id="smallNext" aria-label="Next month">›</button>
       </div>
-      <div class="form-group">
-        <label for="taskDescription">Description</label>
-        <input type="text" id="taskDescription" required>
+
+      <div class="days">
+        <div>Sun</div><div>Mon</div><div>Tue</div>
+        <div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
       </div>
-      <button type="submit">Save Task</button>
-      <button type="button" id="cancelBtn">Cancel</button>
-    </form>
+
+      <div class="dates" id="smallDates"></div>
+
+      <div class="event-box">
+        <h4 id="smallSelectedDate">Select a date</h4>
+        <textarea id="smallEventText" placeholder="Add a plan... ✨"></textarea>
+
+        <div style="display:flex;gap:8px;margin-top:8px;">
+          <select id="smallPriority" style="flex:1;padding:8px;border-radius:8px;border:1px solid #e5e7eb;">
+            <option value="medium" selected>Medium</option>
+            <option value="high">High</option>
+            <option value="low">Low</option>
+          </select>
+          <label style="display:flex;align-items:center;color:#374151;background:#fff;padding:6px;border-radius:8px;">
+            <input type="checkbox" id="smallOneTime" style="margin-right:6px;" /> One-time
+          </label>
+        </div>
+
+        <button class="small-save" id="smallSave">Add Plan</button>
+
+        <div id="smallPlans" class="small-plans"></div>
+        <span class="muted">Click an existing plan to acknowledge (stop notifications) or delete it.</span>
+      </div>
+    </div>
   </div>
 </div>
 
 <script>
-// --------- WEEKLY TASKS ---------
-const days = { monday: [], tuesday: [], wednesday: [], thursday: [], friday: [], saturday: [], sunday: [] };
+// ------------ STORAGE KEYS & UTILS ------------
+const WEEKLY_KEY = 'weeklyTasks_v1';
+const CAL_KEY = 'calendarTasks_v1';
+const LOGGED_USER_KEY = 'loggedInUser_v1'; // optional: set by your login flow
+
+function capitalize(str) { return str ? str.charAt(0).toUpperCase() + str.slice(1) : ''; }
+function escapeHtml(s = '') { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+function isoDateFromParts(y, m, d) { return new Date(y, m, d).toISOString().split('T')[0]; }
+
+// ------------- PERSISTENCE -------------
+function loadWeeklyTasks() {
+  try {
+    const raw = localStorage.getItem(WEEKLY_KEY);
+    if (!raw) {
+      return { monday: [], tuesday: [], wednesday: [], thursday: [], friday: [], saturday: [], sunday: [] };
+    }
+    const parsed = JSON.parse(raw);
+    const base = { monday: [], tuesday: [], wednesday: [], thursday: [], friday: [], saturday: [], sunday: [] };
+    return Object.assign(base, parsed);
+  } catch (e) {
+    console.error('Failed to load weekly tasks', e);
+    return { monday: [], tuesday: [], wednesday: [], thursday: [], friday: [], saturday: [], sunday: [] };
+  }
+}
+function saveWeeklyTasks(obj) {
+  try {
+    localStorage.setItem(WEEKLY_KEY, JSON.stringify(obj));
+  } catch (e) {
+    console.error('Failed to save weekly tasks', e);
+  }
+}
+
+function loadCalendarTasks() {
+  try {
+    const raw = localStorage.getItem(CAL_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch (e) {
+    console.error('Failed to load calendar tasks', e);
+    return {};
+  }
+}
+function saveCalendarTasks(obj) {
+  try {
+    localStorage.setItem(CAL_KEY, JSON.stringify(obj));
+  } catch (e) {
+    console.error('Failed to save calendar tasks', e);
+  }
+}
+
+// ------------- STATE -------------
+let days = loadWeeklyTasks();
+let calendarTasks = loadCalendarTasks();
+
+// UI references
 const scheduleContainer = document.getElementById("schedule-container");
 const currentDayText = document.getElementById("current-day");
 const tasksDayText = document.getElementById("tasks-day");
 
+// wire day button clicks
 document.querySelectorAll(".day-button").forEach(btn => {
   btn.addEventListener("click", () => {
     const day = btn.dataset.day;
     currentDayText.textContent = capitalize(day);
     tasksDayText.textContent = capitalize(day);
     updateTaskList(day);
+    document.querySelectorAll('.day-button').forEach(b => b.style.boxShadow = '');
+    btn.style.boxShadow = '0 2px 8px rgba(0,0,0,0.15)';
   });
 });
 
+// render weekly tasks and attach click-to-acknowledge behavior
 function updateTaskList(day) {
   scheduleContainer.innerHTML = "";
-  days[day].forEach(task => {
+  const list = days[day] || [];
+  if (list.length === 0) {
+    scheduleContainer.innerHTML = `<div class="schedule-item"><em>No tasks for ${capitalize(day)} yet.</em></div>`;
+    return;
+  }
+  list.forEach((task, idx) => {
+    const ackClass = task.acknowledged ? 'ack' : '';
     scheduleContainer.innerHTML += `
-      <div class="schedule-item">
-        <p><strong>${task.start} - ${task.end}</strong></p>
-        <p>${task.description}</p>
-        <p>Priority: ${capitalize(task.priority)}</p>
+      <div class="schedule-item ${ackClass}" data-day="${day}" data-idx="${idx}" title="Click to acknowledge this task">
+        <p><strong>${escapeHtml(task.start)} - ${escapeHtml(task.end)}</strong></p>
+        <p>${escapeHtml(task.description)}</p>
+        <p>Priority: ${capitalize(task.priority)} ${task.oneTime ? '(one-time)' : '(recurring)'}</p>
+        <small>${task.acknowledged ? 'Acknowledged (notifications stopped)' : 'Click to acknowledge and stop notifications'}</small>
       </div>`;
+  });
+
+  // attach click handlers AFTER rendering
+  scheduleContainer.querySelectorAll('.schedule-item').forEach(el => {
+    el.addEventListener('click', () => {
+      const day = el.dataset.day;
+      const idx = Number(el.dataset.idx);
+      if (!days[day] || !days[day][idx]) return;
+      // toggle acknowledgment
+      days[day][idx].acknowledged = true;
+      days[day][idx].lastAcknowledgedAt = new Date().toISOString();
+      saveWeeklyTasks(days);
+      updateTaskList(day);
+    });
   });
 }
 
+// form to add weekly tasks (now supports one-time checkbox)
 document.getElementById("schedule-form").addEventListener("submit", e => {
   e.preventDefault();
   const startTime = document.getElementById("task-start-time").value;
   const endTime = document.getElementById("task-end-time").value;
   const description = document.getElementById("task-description").value;
   const priority = document.getElementById("task-priority").value;
+  const oneTime = document.getElementById("task-oneTime").checked;
   const day = currentDayText.textContent.toLowerCase();
-  days[day].push({ start: startTime, end: endTime, description, priority });
+
+  if (!startTime || !endTime || !description) return;
+
+  const taskObj = {
+    start: startTime,
+    end: endTime,
+    description: description,
+    priority: priority,
+    oneTime: !!oneTime,
+    createdAt: new Date().toISOString(),
+    acknowledged: false,
+    lastNotified: null
+  };
+
+  days[day].push(taskObj);
+  saveWeeklyTasks(days);
   updateTaskList(day);
   e.target.reset();
 });
 
-function capitalize(str) { return str.charAt(0).toUpperCase() + str.slice(1); }
-
-// --------- CALENDAR ---------
-const modal = document.getElementById("taskModal");
-const modalTitle = document.getElementById("modalTitle");
-const taskForm = document.getElementById("taskForm");
-const closeBtn = document.getElementsByClassName("close")[0];
-const cancelBtn = document.getElementById("cancelBtn");
+// ------------- MAIN CALENDAR (page) -------------
 const monthSelect = document.getElementById("monthSelect");
-const calendarHeader = document.querySelector(".calendar-header h2");
+const calendarTitle = document.getElementById("calendarTitle");
 const calendarTable = document.getElementById("calendarTable");
+let currentYear = (new Date()).getFullYear();
+const todayISO = new Date().toISOString().split('T')[0];
 
-let selectedDate = '';
-let currentYear = 2025;
+monthSelect.value = String(new Date().getMonth());
 
 function buildCalendar(month) {
   const year = currentYear;
   const monthName = monthSelect.options[month].text;
-  calendarHeader.textContent = `${monthName} ${year}`;
+  calendarTitle.textContent = `${monthName} ${year}`;
+
   const firstDay = new Date(year, month, 1).getDay();
   const daysInMonth = new Date(year, month+1, 0).getDate();
   const tbody = calendarTable.querySelector("tbody");
   tbody.innerHTML = '';
   let date = 1;
+
   for(let i=0;i<6;i++){
     const row = document.createElement("tr");
     for(let j=0;j<7;j++){
@@ -363,8 +554,36 @@ function buildCalendar(month) {
       if((i===0 && j<firstDay) || date>daysInMonth){
         cell.classList.add("empty");
       } else {
+        const dateISO = isoDateFromParts(year, month, date);
         cell.classList.add("date-cell");
-        cell.textContent = date;
+
+        const numberDiv = document.createElement('div');
+        numberDiv.textContent = date;
+        numberDiv.style.fontWeight = '600';
+        numberDiv.style.marginBottom = '6px';
+        cell.appendChild(numberDiv);
+
+        cell.dataset.date = dateISO;
+
+        if (dateISO === todayISO) {
+          cell.classList.add('today');
+        }
+
+        const tasks = calendarTasks[dateISO] || [];
+        tasks.slice(0, 2).forEach((t) => {
+          const badge = document.createElement('div');
+          badge.className = 'calendar-task';
+          badge.textContent = (t.title || t);
+          cell.appendChild(badge);
+        });
+
+        if (tasks.length > 2) {
+          const more = document.createElement('div');
+          more.className = 'calendar-task';
+          more.textContent = `+${tasks.length - 2} more`;
+          cell.appendChild(more);
+        }
+
         date++;
       }
       row.appendChild(cell);
@@ -373,42 +592,378 @@ function buildCalendar(month) {
   }
 }
 
-monthSelect.addEventListener("change", e => buildCalendar(parseInt(e.target.value)));
+monthSelect.addEventListener("change", e => buildCalendar(parseInt(e.target.value, 10)));
 
+// clicking a calendar cell opens the small modal (same modal) and focuses the small calendar to that date
 calendarTable.addEventListener("click", e => {
-  if(e.target.classList.contains("date-cell")){
-    selectedDate = e.target.textContent;
-    modalTitle.textContent = `Add Task for ${calendarHeader.textContent} ${selectedDate}`;
-    modal.style.display = "block";
-  }
+  const td = e.target.closest('td');
+  if (!td || !td.classList.contains('date-cell')) return;
+  // set the small modal's month to the clicked month
+  const clickedISO = td.dataset.date;
+  openSmallCalendarModalWithDate(clickedISO);
 });
 
-closeBtn.onclick = cancelBtn.onclick = () => modal.style.display = "none";
-window.onclick = e => { if(e.target===modal) modal.style.display="none"; };
+// ------------- SMALL CALENDAR (modal) -------------
+const modal = document.getElementById("taskModal");
+const closeBtn = document.getElementsByClassName("close")[0];
+const smallDates = document.getElementById("smallDates");
+const smallMonthYear = document.getElementById("smallMonthYear");
+const smallSelectedDate = document.getElementById("smallSelectedDate");
+const smallEventText = document.getElementById("smallEventText");
+const smallPlans = document.getElementById("smallPlans");
+const smallSave = document.getElementById("smallSave");
+const smallPrev = document.getElementById("smallPrev");
+const smallNext = document.getElementById("smallNext");
+const smallPriority = document.getElementById("smallPriority");
+const smallOneTime = document.getElementById("smallOneTime");
 
-taskForm.addEventListener("submit", e=>{
-  e.preventDefault();
-  const title = document.getElementById("taskTitle").value;
-  const allCells = calendarTable.querySelectorAll(".date-cell");
-  allCells.forEach(cell => {
-    if(parseInt(cell.textContent) === parseInt(selectedDate)){
-      const span = document.createElement("div");
-      span.style.fontSize="12px";
-      span.style.marginTop="5px";
-      span.style.background="#FFA500";
-      span.style.color="white";
-      span.style.borderRadius="4px";
-      span.textContent = title;
-      cell.appendChild(span);
+let smallCurrent = new Date();
+let smallSelected = null;
+
+function formatMonthYear(date) {
+  return date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+}
+
+function smallGetISO(y, m, d) { return isoDateFromParts(y,m,d); }
+
+function renderSmallCalendar() {
+  smallDates.innerHTML = '';
+  const year = smallCurrent.getFullYear();
+  const month = smallCurrent.getMonth();
+  smallMonthYear.textContent = formatMonthYear(smallCurrent);
+
+  const firstDay = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month+1, 0).getDate();
+
+  // blank slots
+  for (let i = 0; i < firstDay; i++) {
+    const empty = document.createElement('div');
+    smallDates.appendChild(empty);
+  }
+
+  for (let day = 1; day <= daysInMonth; day++) {
+    const dateKey = smallGetISO(year, month, day);
+    const d = document.createElement('div');
+    d.className = 'date';
+    d.textContent = day;
+    d.dataset.date = dateKey;
+    if (dateKey === todayISO) d.classList.add('today');
+    if (dateKey === smallSelected) d.classList.add('selected');
+
+    // show small badge if events present
+    const tasks = calendarTasks[dateKey] || [];
+    if (tasks.length) {
+      const badge = document.createElement('div');
+      badge.className = 'calendar-task';
+      badge.textContent = tasks[0].title || '(plan)';
+      badge.style.marginTop = '6px';
+      d.appendChild(badge);
+    }
+
+    d.addEventListener('click', () => {
+      smallSelected = d.dataset.date;
+      smallSelectedDate.textContent = 'Plans for ' + smallSelected;
+      renderSmallCalendar();
+      renderSmallPlans();
+    });
+
+    smallDates.appendChild(d);
+  }
+}
+
+function renderSmallPlans() {
+  smallPlans.innerHTML = '';
+  if (!smallSelected) return;
+  const plans = calendarTasks[smallSelected] || [];
+  if (!plans.length) {
+    smallPlans.innerHTML = `<div class="small-plan">No plans for ${smallSelected}</div>`;
+    return;
+  }
+  plans.forEach((p, idx) => {
+    const div = document.createElement('div');
+    div.className = 'small-plan';
+    const left = document.createElement('div');
+    left.innerHTML = `<strong>${escapeHtml(p.title)}</strong><div style="font-size:0.85rem;color:#6b7280">${escapeHtml(p.description || '')}</div><small style="color:#6b7280">Priority: ${capitalize(p.priority || 'medium')}${p.oneTime ? ' · one-time' : ''}${p.acknowledged ? ' · acknowledged' : ''}</small>`;
+    const right = document.createElement('div');
+
+    const ackBtn = document.createElement('button');
+    ackBtn.textContent = 'Acknowledge';
+    ackBtn.style.marginRight = '6px';
+    ackBtn.onclick = (ev) => {
+      ev.stopPropagation();
+      calendarTasks[smallSelected][idx].acknowledged = true;
+      saveCalendarTasks(calendarTasks);
+      renderSmallPlans();
+      buildCalendar(parseInt(monthSelect.value, 10));
+    };
+
+    const delBtn = document.createElement('button');
+    delBtn.textContent = 'Delete';
+    delBtn.style.background = '#ef4444';
+    delBtn.onclick = (ev) => {
+      ev.stopPropagation();
+      if (!confirm('Delete this plan?')) return;
+      calendarTasks[smallSelected].splice(idx,1);
+      if (!calendarTasks[smallSelected].length) delete calendarTasks[smallSelected];
+      saveCalendarTasks(calendarTasks);
+      renderSmallPlans();
+      buildCalendar(parseInt(monthSelect.value, 10));
+    };
+
+    right.appendChild(ackBtn);
+    right.appendChild(delBtn);
+    div.appendChild(left);
+    div.appendChild(right);
+    smallPlans.appendChild(div);
+  });
+}
+
+// small calendar nav
+smallPrev.addEventListener('click', () => {
+  smallCurrent.setMonth(smallCurrent.getMonth() - 1);
+  renderSmallCalendar();
+});
+smallNext.addEventListener('click', () => {
+  smallCurrent.setMonth(smallCurrent.getMonth() + 1);
+  renderSmallCalendar();
+});
+
+// open modal focused on a specific ISO date (if provided) or current
+function openSmallCalendarModalWithDate(iso) {
+  modal.style.display = 'block';
+  modal.setAttribute('aria-hidden','false');
+
+  if (iso) {
+    const parts = iso.split('-').map(Number);
+    const dateObj = new Date(parts[0], parts[1]-1, parts[2]);
+    smallCurrent = new Date(dateObj.getFullYear(), dateObj.getMonth(), 1);
+    smallSelected = iso;
+  } else {
+    smallCurrent = new Date();
+    smallSelected = new Date().toISOString().split('T')[0];
+  }
+  smallEventText.value = '';
+  smallPriority.value = 'medium';
+  smallOneTime.checked = false;
+  renderSmallCalendar();
+  renderSmallPlans();
+  document.getElementById('taskTitle')?.focus();
+}
+
+// modal close handlers
+closeBtn.onclick = () => { modal.style.display='none'; modal.setAttribute('aria-hidden','true'); };
+window.addEventListener('click', e => { if (e.target === modal) { modal.style.display='none'; modal.setAttribute('aria-hidden','true'); } });
+
+// saving plan inside modal
+smallSave.addEventListener('click', () => {
+  if (!smallSelected) return alert('Please select a date first.');
+  const title = smallEventText.value.trim();
+  const desc = ''; // small modal uses only event text; we can put it into title/description
+  const priority = smallPriority.value || 'medium';
+  const oneTime = !!smallOneTime.checked;
+  if (!title) return alert('Enter a title for the plan.');
+
+  if (!calendarTasks[smallSelected]) calendarTasks[smallSelected] = [];
+  calendarTasks[smallSelected].push({ title, description: desc, priority, oneTime, createdAt: new Date().toISOString(), acknowledged: false, lastNotified: null });
+  saveCalendarTasks(calendarTasks);
+  smallEventText.value = '';
+  renderSmallPlans();
+  renderSmallCalendar();
+  buildCalendar(parseInt(monthSelect.value, 10));
+});
+
+// ------------- DAILY CLEANUP (oneTime weekly tasks removed after retention, calendar tasks older than cutoff) -------------
+const retentionDays = 30; // change if needed
+
+function dailyCleanup() {
+  try {
+    const cutoff = Date.now() - retentionDays * 24 * 60 * 60 * 1000;
+    // cleanup calendar tasks older than cutoff (based on createdAt)
+    Object.keys(calendarTasks).forEach(dateISO => {
+      const arr = calendarTasks[dateISO];
+      const kept = arr.filter(t => {
+        if (!t.createdAt) return true; // keep if no timestamp
+        return new Date(t.createdAt).getTime() >= cutoff;
+      });
+      if (kept.length) {
+        calendarTasks[dateISO] = kept;
+      } else {
+        delete calendarTasks[dateISO];
+      }
+    });
+    saveCalendarTasks(calendarTasks);
+
+    // cleanup weekly tasks only if they are oneTime and older than cutoff
+    Object.keys(days).forEach(day => {
+      days[day] = (days[day] || []).filter(t => {
+        if (!t.oneTime) return true; // keep recurring tasks
+        if (!t.createdAt) return true;
+        return new Date(t.createdAt).getTime() >= cutoff;
+      });
+    });
+    saveWeeklyTasks(days);
+
+    // rebuild UI
+    buildCalendar(parseInt(monthSelect.value, 10));
+    updateTaskList(currentDayText.textContent.toLowerCase());
+  } catch (e) {
+    console.error('Daily cleanup failed', e);
+  }
+}
+
+function scheduleDailyCleanup() {
+  // run once now
+  dailyCleanup();
+  // compute ms until next midnight
+  const now = new Date();
+  const nextMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+  const msUntil = nextMidnight - now;
+  setTimeout(() => {
+    dailyCleanup();
+    // after first run, run every 24h
+    setInterval(dailyCleanup, 24 * 60 * 60 * 1000);
+  }, msUntil);
+}
+
+// ------------- NOTIFICATIONS (in-page) -------------
+let notifIntervals = [];
+let loggedInUser = localStorage.getItem(LOGGED_USER_KEY) || null;
+
+function onUserLogin(username) {
+  loggedInUser = username;
+  localStorage.setItem(LOGGED_USER_KEY, username);
+  startNotificationService();
+}
+function onUserLogout() {
+  loggedInUser = null;
+  localStorage.removeItem(LOGGED_USER_KEY);
+  stopNotificationService();
+}
+
+async function requestNotificationPermission() {
+  if (!('Notification' in window)) return false;
+  if (Notification.permission === 'granted') return true;
+  if (Notification.permission === 'denied') return false;
+  const result = await Notification.requestPermission();
+  return result === 'granted';
+}
+function notifyUser(title, body) {
+  if (Notification.permission !== 'granted') return;
+  try {
+    new Notification(title, { body });
+  } catch (e) {
+    console.error('Notification failed', e);
+  }
+}
+
+function markWeeklyTaskNotified(day, index) {
+  const list = days[day];
+  if (!list || !list[index]) return;
+  list[index].lastNotified = new Date().toISOString();
+  saveWeeklyTasks(days);
+}
+function shouldNotifyTaskWeekly(task, minGapMinutes = 10) {
+  if (!task) return false;
+  if (task.acknowledged) return false;
+  if (!task.lastNotified) return true;
+  const last = new Date(task.lastNotified);
+  const diffMin = (Date.now() - last.getTime()) / 60000;
+  return diffMin >= minGapMinutes;
+}
+function checkWeeklyTasksForPriority(priority, notifyGapMinutes) {
+  if (!loggedInUser) return;
+  const weekday = new Date().toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
+  const list = days[weekday] || [];
+  list.forEach((task, idx) => {
+    if ((task.priority || '').toLowerCase() === priority.toLowerCase()) {
+      if (shouldNotifyTaskWeekly(task, notifyGapMinutes)) {
+        notifyUser(`${capitalize(priority)} priority: ${task.description || 'Task'}`, `Time: ${task.start || ''} - ${task.end || ''}`);
+        markWeeklyTaskNotified(weekday, idx);
+      }
     }
   });
-  taskForm.reset();
-  modal.style.display="none";
-});
+}
 
-// Initialize
-buildCalendar(9); // October
-updateTaskList("monday");
+function shouldNotifyCalendarTask(task, minGapMinutes = 10) {
+  if (!task) return false;
+  if (task.acknowledged) return false;
+  if (!task.lastNotified) return true;
+  const last = new Date(task.lastNotified);
+  const diffMin = (Date.now() - last.getTime()) / 60000;
+  return diffMin >= minGapMinutes;
+}
+function markCalendarTaskNotified(dateISO, idx) {
+  if (!calendarTasks[dateISO] || !calendarTasks[dateISO][idx]) return;
+  calendarTasks[dateISO][idx].lastNotified = new Date().toISOString();
+  saveCalendarTasks(calendarTasks);
+}
+function checkCalendarTasksForPriority(priority, notifyGapMinutes) {
+  if (!loggedInUser) return;
+  const today = new Date().toISOString().split('T')[0];
+  const list = calendarTasks[today] || [];
+  list.forEach((task, idx) => {
+    if ((task.priority || 'medium').toLowerCase() === priority.toLowerCase()) {
+      if (shouldNotifyCalendarTask(task, notifyGapMinutes)) {
+        notifyUser(`${capitalize(priority)} calendar task: ${task.title || 'Task'}`, `${task.description || ''}`);
+        markCalendarTaskNotified(today, idx);
+      }
+    }
+  });
+}
+
+async function startNotificationService() {
+  const ok = await requestNotificationPermission();
+  if (!ok) {
+    console.warn('Notifications permission not granted.');
+    return;
+  }
+  stopNotificationService();
+  // High: every 2 minutes
+  notifIntervals.push(setInterval(() => checkWeeklyTasksForPriority('high', 2), 2 * 60 * 1000));
+  notifIntervals.push(setInterval(() => checkCalendarTasksForPriority('high', 2), 2 * 60 * 1000));
+  // Medium: every 5 minutes
+  notifIntervals.push(setInterval(() => checkWeeklyTasksForPriority('medium', 5), 5 * 60 * 1000));
+  notifIntervals.push(setInterval(() => checkCalendarTasksForPriority('medium', 5), 5 * 60 * 1000));
+  // Low: every 10 minutes
+  notifIntervals.push(setInterval(() => checkWeeklyTasksForPriority('low', 10), 10 * 60 * 1000));
+  notifIntervals.push(setInterval(() => checkCalendarTasksForPriority('low', 10), 10 * 60 * 1000));
+
+  // run immediate checks
+  checkWeeklyTasksForPriority('high', 2);
+  checkCalendarTasksForPriority('high', 2);
+  checkWeeklyTasksForPriority('medium', 5);
+  checkCalendarTasksForPriority('medium', 5);
+  checkWeeklyTasksForPriority('low', 10);
+  checkCalendarTasksForPriority('low', 10);
+}
+
+function stopNotificationService() {
+  notifIntervals.forEach(i => clearInterval(i));
+  notifIntervals = [];
+}
+
+// ------------- INIT -------------
+function init() {
+  if (!monthSelect.value) monthSelect.value = String(new Date().getMonth());
+  buildCalendar(parseInt(monthSelect.value, 10));
+
+  days = loadWeeklyTasks();
+  calendarTasks = loadCalendarTasks();
+
+  currentDayText.textContent = 'Monday';
+  tasksDayText.textContent = 'Monday';
+  updateTaskList('monday');
+
+  scheduleDailyCleanup();
+
+  // start notifications automatically if user already logged in
+  if (localStorage.getItem(LOGGED_USER_KEY)) {
+    loggedInUser = localStorage.getItem(LOGGED_USER_KEY);
+    startNotificationService();
+  }
+}
+
+init();
 </script>
 </body>
 </html>
