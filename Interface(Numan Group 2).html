@@ -397,7 +397,7 @@ th { background-color: #fff3e0; font-weight: bold; }
 // ------------ STORAGE KEYS & UTILS ------------
 const WEEKLY_KEY = 'weeklyTasks_v1';
 const CAL_KEY = 'calendarTasks_v1';
-const LOGGED_USER_KEY = 'loggedInUser_v1'; // optional: set by your login flow
+const LOGGED_USER_KEY = 'loggedInUser_v1'; // must match Login page
 
 function capitalize(str) { return str ? str.charAt(0).toUpperCase() + str.slice(1) : ''; }
 function escapeHtml(s = '') { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
@@ -905,7 +905,9 @@ function checkCalendarTasksForPriority(priority, notifyGapMinutes) {
     if ((task.priority || 'medium').toLowerCase() === priority.toLowerCase()) {
       if (shouldNotifyCalendarTask(task, notifyGapMinutes)) {
         notifyUser(`${capitalize(priority)} calendar task: ${task.title || 'Task'}`, `${task.description || ''}`);
-        markCalendarTaskNotified(today, idx);
+        // mark notified so it won't immediately repeat
+        calendarTasks[today][idx].lastNotified = new Date().toISOString();
+        saveCalendarTasks(calendarTasks);
       }
     }
   });
@@ -918,17 +920,20 @@ async function startNotificationService() {
     return;
   }
   stopNotificationService();
+
   // High: every 2 minutes
   notifIntervals.push(setInterval(() => checkWeeklyTasksForPriority('high', 2), 2 * 60 * 1000));
   notifIntervals.push(setInterval(() => checkCalendarTasksForPriority('high', 2), 2 * 60 * 1000));
+
   // Medium: every 5 minutes
   notifIntervals.push(setInterval(() => checkWeeklyTasksForPriority('medium', 5), 5 * 60 * 1000));
   notifIntervals.push(setInterval(() => checkCalendarTasksForPriority('medium', 5), 5 * 60 * 1000));
+
   // Low: every 10 minutes
   notifIntervals.push(setInterval(() => checkWeeklyTasksForPriority('low', 10), 10 * 60 * 1000));
   notifIntervals.push(setInterval(() => checkCalendarTasksForPriority('low', 10), 10 * 60 * 1000));
 
-  // run immediate checks
+  // immediate check
   checkWeeklyTasksForPriority('high', 2);
   checkCalendarTasksForPriority('high', 2);
   checkWeeklyTasksForPriority('medium', 5);
@@ -942,7 +947,55 @@ function stopNotificationService() {
   notifIntervals = [];
 }
 
-// ------------- INIT -------------
+// expose login/logout functions globally so other windows can call them
+window.onUserLogin = function(username) {
+  onUserLogin(username);
+};
+window.onUserLogout = function() {
+  onUserLogout();
+};
+
+// Cross-tab coordination:
+// 1) Listen for storage events (fires in other tabs when localStorage changes)
+window.addEventListener('storage', (e) => {
+  if (e.key === LOGGED_USER_KEY) {
+    if (e.newValue === null) {
+      // logged out in another tab
+      try { onUserLogout(); } catch (err) { console.warn('onUserLogout not defined', err); }
+    } else {
+      // logged in in another tab
+      try { onUserLogin(e.newValue); } catch (err) { console.warn('onUserLogin not defined', err); }
+    }
+  }
+});
+
+// 2) BroadcastChannel for immediate messaging (if supported)
+let bc = null;
+try {
+  bc = new BroadcastChannel('schedule_planner_channel');
+  bc.addEventListener('message', (ev) => {
+    const msg = ev.data;
+    if (!msg || !msg.type) return;
+    if (msg.type === 'logout') {
+      try { onUserLogout(); } catch (err) { console.warn('onUserLogout not defined', err); }
+    } else if (msg.type === 'login' && msg.username) {
+      try { onUserLogin(msg.username); } catch (err) { console.warn('onUserLogin not defined', err); }
+    }
+  });
+} catch (e) {
+  console.warn('BroadcastChannel unavailable in this browser', e);
+}
+
+// Helper: allow Homepage to call planner.stop via opener reference (best-effort)
+try {
+  if (window.opener && typeof window.opener.postMessage === 'function') {
+    // no-op; Homepage attempts direct window.opener.onUserLogout() when it has a ref
+  }
+} catch (e) {
+  // ignore cross-origin access errors
+}
+
+// Final init
 function init() {
   if (!monthSelect.value) monthSelect.value = String(new Date().getMonth());
   buildCalendar(parseInt(monthSelect.value, 10));
