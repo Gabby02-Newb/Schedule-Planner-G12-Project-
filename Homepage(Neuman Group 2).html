@@ -8,7 +8,7 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      background-image: url('https://static.vecteezy.com/system/resources/previews/010/008/086/non_2x/background-dimension-3d-graphic-message-board-for-text-and-message-design-line-shadow-for-modern-web-design-free-vector.jpg');
+      background-image: url('https://static.vecteezy.com/system/resources/previews/010/008/086/non_2x/background-dimension-3d-graphic-message-board-for-text-and-message-design-line-shadow-for-modern-w[...]
       background-repeat: no-repeat;
       background-position: center center;
       background-size: cover;
@@ -26,6 +26,7 @@
       padding: 50px;
       border-radius: 10px;
       width: 60%;
+      position: relative;
     }
 
     h1 {
@@ -67,10 +68,43 @@
       margin: 0;
       font-size: 16px;
     }
+
+    /* Logout button in upper-right corner */
+    #logoutBtn {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background-color: #ff6b6b;
+      color: white;
+      border: none;
+      padding: 10px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    #logoutBtn:hover {
+      background-color: #ff4c4c;
+    }
+
+    /* make sure the logout button is visible even on small screens */
+    @media (max-width: 700px) {
+      .container { width: 90%; padding: 30px; }
+      #logoutBtn { top: 8px; right: 8px; padding: 8px 10px; font-size: 13px; }
+      .button-container { grid-template-columns: repeat(1, 1fr); }
+    }
   </style>
 </head>
 <body>
   <div class="container">
+    <!-- Logout placed here so it's anchored to the top-right of the container (visible on page) -->
+    <button id="logoutBtn" title="Log out">
+      <i class="fas fa-sign-out-alt" aria-hidden="true"></i>
+      <span>Log out</span>
+    </button>
+
     <h1>Welcome to Your Schedule Planner</h1>
     <div class="button-container">
 
@@ -80,19 +114,45 @@
         <p>Guide</p>
       </button>
 
-<!-- Button to Schedule Planner -->
-<button class="nav-button" onclick="window.location.href='Interface(Numan Group 2).html'">
-  <i class="fas fa-calendar-alt"></i>
-  <p>Schedule Planner</p>
-</button>
+      <!-- Button to Schedule Planner -->
+      <button class="nav-button" onclick="window.location.href='Interface(Numan Group 2).html'">
+        <i class="fas fa-calendar-alt"></i>
+        <p>Schedule Planner</p>
+      </button>
 
-<!-- Button to Information -->
-<button class="nav-button" onclick="window.location.href='Info(Neuman Group 2).html'">
-  <i class="fas fa-info-circle"></i>
-  <p>Information</p>
-</button>
+      <!-- Button to Information -->
+      <button class="nav-button" onclick="window.location.href='Info(Neuman Group 2).html'">
+        <i class="fas fa-info-circle"></i>
+        <p>Information</p>
+      </button>
 
     </div>
   </div>
+
+  <script>
+    // Use the same key used by the login/planner pages
+    const LOGGED_USER_KEY = 'loggedInUser_v1';
+
+    // When logout clicked: remove the logged-in marker and redirect to the login page.
+    // If planner is open in another tab/window it will detect the removed key on next activity.
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+      // Remove logged-in flag
+      try { localStorage.removeItem(LOGGED_USER_KEY); } catch (e) { console.error(e); }
+
+      // Optional: try to notify planner in another window (if opened via window.opener).
+      // This is a best-effort; if planner is open in a different tab it will still need to read localStorage.
+      try {
+        // If this page opened the planner in a new window and still has a reference:
+        if (window.opener && typeof window.opener.onUserLogout === 'function') {
+          try { window.opener.onUserLogout(); } catch (err) { /* ignore cross-origin errors */ }
+        }
+      } catch (err) {
+        // ignore
+      }
+
+      // Redirect to login page
+      window.location.href = 'Login(Neuman Group 2).html';
+    });
+  </script>
 </body>
 </html>
