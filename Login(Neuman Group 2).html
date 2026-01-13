@@ -213,6 +213,9 @@
   </div>
 
   <script>
+    // Storage key used by the planner for logged-in user
+    const LOGGED_USER_KEY = 'loggedInUser_v1';
+
     // Utility: hash a password using SHA-256 and return hex string
     async function hashPassword(password) {
       const enc = new TextEncoder();
@@ -358,6 +361,20 @@
       }
     });
 
+    // Helper: request notification permission (used to prompt user at login time)
+    async function requestNotificationPermissionAtLogin() {
+      if (!('Notification' in window)) return false;
+      try {
+        if (Notification.permission === 'granted') return true;
+        if (Notification.permission === 'denied') return false;
+        const result = await Notification.requestPermission();
+        return result === 'granted';
+      } catch (e) {
+        console.error('Notification permission request failed', e);
+        return false;
+      }
+    }
+
     // Login handler
     loginForm.addEventListener('submit', async function(event) {
       event.preventDefault();
@@ -376,12 +393,23 @@
       try {
         const hashed = await hashPassword(password);
         if (users[username] === hashed) {
-          loginMessage.style.color = 'green';
-          loginMessage.textContent = 'Login successful! Redirecting...';
-          // Redirect to homepage in same folder (change filename if different)
-          setTimeout(() => {
-            window.location.href = "Homepage(Neuman Group 2).html";
-          }, 900);
+          // Mark user as logged in for planner notifications and other pages
+          localStorage.setItem(LOGGED_USER_KEY, username);
+
+          // Optionally request notification permission now so the planner can start immediately after redirect.
+          requestNotificationPermissionAtLogin().then((granted) => {
+            // If you want to track permission, you can store a flag; planner checks Notification.permission directly.
+            if (granted) {
+              console.info('Notifications granted at login for', username);
+            }
+            // Show success message then redirect
+            loginMessage.style.color = 'green';
+            loginMessage.textContent = 'Login successful! Redirecting...';
+            setTimeout(() => {
+              // Redirect to homepage / planner
+              window.location.href = "Homepage(Neuman Group 2).html";
+            }, 700);
+          });
         } else {
           loginMessage.style.color = 'red';
           loginMessage.textContent = 'Incorrect username or password.';
