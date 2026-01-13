@@ -6,40 +6,56 @@
   <title>Home - Schedule Planner</title>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet" />
   <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+    }
+
     body {
       font-family: Arial, sans-serif;
-      /* The original background image URL you provided for Guide is used as a nicer backdrop */
-      background-image: url('https://static.vecteezy.com/system/resources/previews/010/008/086/non_2x/background-dimension-3d-graphic-message-board-for-text-and-message-design-line-shadow-for-modern-web-design-free-vector.jpg');
+      /* full background image with fallback */
+      background-color: #1f2937;
+      background-image:
+        url('https://static.vecteezy.com/system/resources/previews/010/008/086/non_2x/background-dimension-3d-graphic-message-board-for-text-and-message-design-line-shadow-for-modern-web-design-free-vector.jpg');
       background-repeat: no-repeat;
       background-position: center center;
       background-size: cover;
+      background-attachment: fixed;
       color: white;
-      text-align: center;
-      height: 100vh;
-      margin: 0;
       display: flex;
       justify-content: center;
       align-items: center;
     }
 
+    /* main centered panel */
     .container {
-      background-color: rgba(0, 0, 0, 0.7);
-      padding: 50px;
-      border-radius: 10px;
-      width: 60%;
-      position: relative;
+      background-color: rgba(0, 0, 0, 0.72);
+      padding: 48px;
+      border-radius: 12px;
+      width: 68%;
+      max-width: 1100px;
+      box-sizing: border-box;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+      /* give some top padding so fixed logout doesn't overlap on very small screens */
+      padding-top: 64px;
     }
 
     h1 {
-      font-family: Algerian, serif;
+      font-family: "Times New Roman", Times, serif;
       color: white;
-      margin-bottom: 20px;
+      margin: 0 0 8px 0;
+      font-size: 36px;
     }
 
     .button-container {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 20px;
+      width: 100%;
     }
 
     .nav-button {
@@ -50,131 +66,84 @@
       border-radius: 10px;
       cursor: pointer;
       font-size: 18px;
-      transition: background-color 0.3s ease;
+      transition: background-color 0.2s ease;
       display: flex;
       align-items: center;
       justify-content: center;
-      text-align: center;
+      gap: 10px;
+      min-height: 80px;
     }
+    .nav-button:hover { background-color: #ff9800; }
+    .nav-button i { font-size: 22px; }
+    .nav-button p { margin: 0; font-size: 16px; }
 
-    .nav-button:hover {
-      background-color: #ff9800;
-    }
-
-    .nav-button i {
-      margin-right: 10px;
-    }
-
-    .nav-button p {
-      margin: 0;
-      font-size: 16px;
-    }
-
-    /* Logout button in upper-right corner */
+    /* Logout button fixed to the viewport upper-right */
     #logoutBtn {
-      position: absolute;
-      top: 12px;
-      right: 12px;
+      position: fixed;
+      top: 14px;
+      right: 14px;
       background-color: #ff6b6b;
       color: white;
       border: none;
-      padding: 10px 12px;
+      padding: 10px 14px;
       border-radius: 8px;
       cursor: pointer;
       font-size: 14px;
       display: flex;
       align-items: center;
       gap: 8px;
+      z-index: 2000;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.35);
     }
-    #logoutBtn:hover {
-      background-color: #ff4c4c;
+    #logoutBtn:hover { background-color: #ff4c4c; }
+
+    @media (max-width: 900px) {
+      .container { width: 90%; padding: 36px; padding-top: 72px; }
+      .button-container { grid-template-columns: repeat(2, 1fr); }
+      .nav-button { min-height: 70px; font-size: 16px; }
     }
 
-    @media (max-width: 700px) {
-      .container { width: 90%; padding: 30px; }
-      #logoutBtn { top: 8px; right: 8px; padding: 8px 10px; font-size: 13px; }
-      .button-container { grid-template-columns: repeat(1, 1fr); }
+    @media (max-width: 560px) {
+      .button-container { grid-template-columns: 1fr; }
+      .container { padding-top: 90px; }
     }
-
-    /* Guide modal styles */
-    .modal {
-      display: none;
-      position: fixed;
-      z-index: 1200;
-      left: 0; top: 0;
-      width: 100%; height: 100%;
-      background-color: rgba(0,0,0,0.6);
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-    }
-    .modal.open { display: flex; }
-
-    .modal-panel {
-      background-color: rgba(255,255,255,0.95);
-      color: #111827;
-      max-width: 900px;
-      width: 100%;
-      border-radius: 12px;
-      padding: 28px;
-      max-height: 90vh;
-      overflow: auto;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.4);
-    }
-
-    .modal-panel h1 { text-align: center; margin-top: 0; font-family: Algerian, serif; }
-    .modal-panel ul { list-style-type: disc; margin-left: 40px; font-size: 1.05rem; color: #111827; }
-    .modal-close {
-      position: absolute;
-      top: 18px;
-      right: 22px;
-      background: transparent;
-      border: none;
-      font-size: 22px;
-      cursor: pointer;
-      color: #fff;
-    }
-    .modal-panel .nav-button { background-color: orange; color: white; }
-    .modal-panel .nav-button:hover { background-color: #ff9800; }
   </style>
 </head>
 <body>
-  <div class="container">
-    <!-- Logout placed here so it's anchored to the top-right of the container -->
-    <button id="logoutBtn" title="Log out" aria-label="Log out">
-      <i class="fas fa-sign-out-alt" aria-hidden="true"></i>
-      <span>Log out</span>
-    </button>
+  <!-- Logout fixed in viewport upper-right -->
+  <button id="logoutBtn" title="Log out" aria-label="Log out">
+    <i class="fas fa-sign-out-alt" aria-hidden="true"></i>
+    <span>Log out</span>
+  </button>
 
-    <h1>Welcome to Your Schedule Planner</h1>
-    <div class="button-container">
+  <div class="container" role="main" aria-labelledby="welcomeTitle">
+    <h1 id="welcomeTitle">Welcome to Your Schedule Planner</h1>
 
-      <!-- Button to open Guide modal -->
+    <div class="button-container" role="navigation" aria-label="Main navigation">
+      <!-- Guide opens embedded modal (keeps user on homepage) -->
       <button class="nav-button" id="openGuideBtn" aria-haspopup="dialog">
-        <i class="fas fa-book-open"></i>
+        <i class="fas fa-book-open" aria-hidden="true"></i>
         <p>Guide</p>
       </button>
 
-      <!-- Button to Schedule Planner -->
-      <button class="nav-button" onclick="window.location.href='Interface(Numan Group 2).html'">
-        <i class="fas fa-calendar-alt"></i>
+      <!-- Planner nav -->
+      <button class="nav-button" id="openPlannerBtn">
+        <i class="fas fa-calendar-alt" aria-hidden="true"></i>
         <p>Schedule Planner</p>
       </button>
 
-      <!-- Button to Information -->
-      <button class="nav-button" onclick="window.location.href='Info(Neuman Group 2).html'">
-        <i class="fas fa-info-circle"></i>
+      <!-- Info nav -->
+      <button class="nav-button" id="openInfoBtn">
+        <i class="fas fa-info-circle" aria-hidden="true"></i>
         <p>Information</p>
       </button>
-
     </div>
   </div>
 
-  <!-- Guide Modal (embedded Guide content) -->
-  <div id="guideModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="guideTitle">
-    <div class="modal-panel" role="document">
-      <button class="modal-close" id="closeGuideBtn" aria-label="Close guide">&times;</button>
-
+  <!-- Guide Modal (embedded content) -->
+  <div id="guideModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="guideTitle" style="display:none;">
+    <div class="modal-panel" role="document" style="position:relative;">
+      <button class="modal-close" id="closeGuideBtn" aria-label="Close guide" style="position:absolute;top:12px;right:12px;background:transparent;border:none;font-size:28px;cursor:pointer;color:#111827;">&times;</button>
       <h1 id="guideTitle">How to Use the Schedule Planner</h1>
 
       <h2>Step 1: Create Your Schedule</h2>
@@ -197,79 +166,79 @@
       </ul>
 
       <div style="text-align:center;margin-top:18px;">
-        <button class="nav-button" id="guideHomeBtn">
-          <i class="fas fa-home"></i>
-          <p>Back to Home</p>
+        <button class="nav-button" id="guideHomeBtn" style="display:inline-flex;align-items:center;gap:8px;">
+          <i class="fas fa-home" aria-hidden="true"></i><p>Back to Home</p>
         </button>
       </div>
     </div>
   </div>
 
   <script>
-    // Use the same key used by the login/planner pages
-    const LOGGED_USER_KEY = 'loggedInUser_v1';
+    document.addEventListener('DOMContentLoaded', () => {
+      const LOGGED_USER_KEY = 'loggedInUser_v1';
 
-    // BroadcastChannel (best-effort) to notify other same-origin tabs immediately
-    let bc = null;
-    try {
-      bc = new BroadcastChannel('schedule_planner_channel');
-    } catch (e) {
-      // BroadcastChannel not supported — storage events will still work
-      bc = null;
-    }
+      // BroadcastChannel (best-effort)
+      let bc = null;
+      try { bc = new BroadcastChannel('schedule_planner_channel'); }
+      catch (err) { bc = null; }
 
-    // Logout behavior: removes logged-in marker, broadcasts logout, attempts to notify opener, then redirect to login.
-    document.getElementById('logoutBtn').addEventListener('click', () => {
-      try { localStorage.removeItem(LOGGED_USER_KEY); } catch (e) { console.error(e); }
+      const logoutBtn = document.getElementById('logoutBtn');
+      const openGuideBtn = document.getElementById('openGuideBtn');
+      const closeGuideBtn = document.getElementById('closeGuideBtn');
+      const guideModal = document.getElementById('guideModal');
+      const guideHomeBtn = document.getElementById('guideHomeBtn');
+      const openPlannerBtn = document.getElementById('openPlannerBtn');
+      const openInfoBtn = document.getElementById('openInfoBtn');
 
-      try { if (bc) bc.postMessage({ type: 'logout' }); } catch (err) { console.warn('Broadcast failed', err); }
+      // Navigation
+      openPlannerBtn.addEventListener('click', () => { window.location.href = 'Interface(Numan Group 2).html'; });
+      openInfoBtn.addEventListener('click', () => { window.location.href = 'Info(Neuman Group 2).html'; });
 
-      try {
-        if (window.opener && typeof window.opener.onUserLogout === 'function') {
-          try { window.opener.onUserLogout(); } catch (err) { /* ignore cross-origin errors */ }
+      // Logout logic
+      logoutBtn.addEventListener('click', () => {
+        try {
+          localStorage.removeItem(LOGGED_USER_KEY);
+          // short "ping" so storage listeners get a change
+          try { localStorage.setItem('logoutPing', String(Date.now())); } catch (e) { /* ignore */ }
+        } catch (err) { console.error(err); }
+
+        try { if (bc) bc.postMessage({ type: 'logout' }); } catch (err) { /* ignore */ }
+
+        try {
+          if (window.opener && typeof window.opener.onUserLogout === 'function') {
+            try { window.opener.onUserLogout(); } catch (e) { /* ignore */ }
+          }
+        } catch (e) { /* ignore */ }
+
+        // redirect to login
+        setTimeout(() => { window.location.href = 'Login(Neuman Group 2).html'; }, 120);
+      });
+
+      // Guide modal
+      openGuideBtn.addEventListener('click', () => {
+        guideModal.style.display = 'flex';
+        closeGuideBtn.focus();
+      });
+      closeGuideBtn.addEventListener('click', () => {
+        guideModal.style.display = 'none';
+        openGuideBtn.focus();
+      });
+      guideModal.addEventListener('click', (e) => {
+        if (e.target === guideModal) {
+          guideModal.style.display = 'none';
+          openGuideBtn.focus();
         }
-      } catch (err) { /* ignore */ }
-
-      // Redirect to login
-      window.location.href = 'Login(Neuman Group 2).html';
-    });
-
-    // Guide modal open/close
-    const guideModal = document.getElementById('guideModal');
-    const openGuideBtn = document.getElementById('openGuideBtn');
-    const closeGuideBtn = document.getElementById('closeGuideBtn');
-    const guideHomeBtn = document.getElementById('guideHomeBtn');
-
-    openGuideBtn.addEventListener('click', () => {
-      guideModal.classList.add('open');
-      // move focus to modal for accessibility
-      closeGuideBtn.focus();
-    });
-
-    closeGuideBtn.addEventListener('click', () => {
-      guideModal.classList.remove('open');
-      openGuideBtn.focus();
-    });
-
-    guideHomeBtn.addEventListener('click', () => {
-      guideModal.classList.remove('open');
-      // Stay on homepage — no navigation needed; keep user on Home
-    });
-
-    // Close modal on Escape
-    window.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && guideModal.classList.contains('open')) {
-        guideModal.classList.remove('open');
+      });
+      window.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && guideModal.style.display === 'flex') {
+          guideModal.style.display = 'none';
+          openGuideBtn.focus();
+        }
+      });
+      guideHomeBtn?.addEventListener('click', () => {
+        guideModal.style.display = 'none';
         openGuideBtn.focus();
-      }
-    });
-
-    // Close modal when clicking outside panel
-    guideModal.addEventListener('click', (e) => {
-      if (e.target === guideModal) {
-        guideModal.classList.remove('open');
-        openGuideBtn.focus();
-      }
+      });
     });
   </script>
 </body>
