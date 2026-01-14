@@ -84,26 +84,91 @@
   <script>
     // Keys
     const USERS_KEY = 'local_users_v1';
-    function storageKeyForUser(username) { return 'tasks_' + encodeURIComponent(username); }
 
-    // Basic localStorage helpers
-    function loadUsers() {
-      try { return JSON.parse(localStorage.getItem(USERS_KEY)) || []; } catch (e) { return []; }
+    // Normalize helpers:
+    function normalizeDisplayName(name) {
+      // Trim and preserve original-case for display
+      if (name == null) return '';
+      return String(name).trim();
     }
-    function saveUsers(list) { localStorage.setItem(USERS_KEY, JSON.stringify(list)); }
+    function normalizeKeyName(name) {
+      // Trim and canonicalize for storage keys (case-insensitive),
+      // so "Acc1", "acc1", " acc1 " all map to same storage key.
+      if (name == null) return '';
+      return String(name).trim().toLowerCase();
+    }
+
+    function storageKeyForUser(username) {
+      const k = normalizeKeyName(username);
+      if (!k) return null;
+      return 'tasks_' + encodeURIComponent(k);
+    }
+
+    // Basic localStorage helpers (with normalization & dedupe)
+    function loadUsers() {
+      try {
+        const raw = localStorage.getItem(USERS_KEY);
+        if (!raw) return [];
+        const arr = JSON.parse(raw) || [];
+        const seen = new Set();
+        const normalized = [];
+        for (let u of arr) {
+          if (u == null) continue;
+          const display = normalizeDisplayName(u);
+          if (!display) continue;
+          const key = normalizeKeyName(display);
+          if (!seen.has(key)) {
+            seen.add(key);
+            // Keep first-seen display casing
+            normalized.push(display);
+          }
+        }
+        return normalized;
+      } catch (e) {
+        console.warn('Bad users JSON', e);
+        return [];
+      }
+    }
+
+    function saveUsers(list) {
+      const seen = new Set();
+      const out = [];
+      for (let u of (list || [])) {
+        if (u == null) continue;
+        const display = normalizeDisplayName(u);
+        if (!display) continue;
+        const key = normalizeKeyName(display);
+        if (!seen.has(key)) {
+          seen.add(key);
+          out.push(display);
+        }
+      }
+      localStorage.setItem(USERS_KEY, JSON.stringify(out));
+    }
+
     function ensureUserExists(u) {
       if (!u) return;
+      const name = normalizeDisplayName(u);
+      if (!name) return;
       const list = loadUsers();
-      if (!list.includes(u)) { list.push(u); saveUsers(list); }
+      const lc = normalizeKeyName(name);
+      if (!list.some(x => normalizeKeyName(x) === lc)) {
+        list.push(name);
+        saveUsers(list);
+      }
     }
 
     function loadTasks(username) {
-      const raw = localStorage.getItem(storageKeyForUser(username));
+      const key = storageKeyForUser(username);
+      if (!key) return [];
+      const raw = localStorage.getItem(key);
       if (!raw) return [];
       try { return JSON.parse(raw) || []; } catch (e) { console.warn('Bad tasks JSON for', username); return []; }
     }
     function saveTasks(username, tasks) {
-      localStorage.setItem(storageKeyForUser(username), JSON.stringify(tasks));
+      const key = storageKeyForUser(username);
+      if (!key) return;
+      localStorage.setItem(key, JSON.stringify(tasks));
     }
 
     // Elements
@@ -150,24 +215,30 @@
     }
 
     function setCurrentUser(username) {
-      currentUser = username || null;
-      if (currentUser) {
-        app.style.display = '';
-        currentUserLabel.textContent = currentUser;
-        usernameInput.value = '';
-        ensureUserExists(currentUser);
-        refreshUserSelector();
-        // select current in dropdown
-        for (const opt of switchSelect.options) opt.selected = (opt.value === currentUser);
-        renderTasks();
-        // store last user (optional)
-        localStorage.setItem('last_local_user', currentUser);
-      } else {
+      const name = normalizeDisplayName(username);
+      if (!name) {
+        currentUser = null;
         app.style.display = 'none';
         currentUserLabel.textContent = '';
         taskList.innerHTML = '';
         localStorage.removeItem('last_local_user');
+        return;
       }
+
+      currentUser = name;
+      app.style.display = '';
+      currentUserLabel.textContent = currentUser;
+      usernameInput.value = '';
+      ensureUserExists(currentUser);
+      refreshUserSelector();
+      // select current in dropdown (match by normalized key)
+      const curKey = normalizeKeyName(currentUser);
+      for (const opt of switchSelect.options) {
+        opt.selected = (normalizeKeyName(opt.value) === curKey);
+      }
+      renderTasks();
+      // store last user (display form)
+      localStorage.setItem('last_local_user', currentUser);
     }
 
     // Rendering and operations
@@ -254,7 +325,8 @@
 
     // Events
     loginBtn.addEventListener('click', () => {
-      const name = usernameInput.value.trim();
+      const raw = usernameInput.value;
+      const name = normalizeDisplayName(raw);
       if (!name) return alert('Enter a username');
       setCurrentUser(name);
     });
@@ -279,9 +351,11 @@
     clearAccountBtn.addEventListener('click', () => {
       if (!currentUser) return alert('No user selected');
       if (!confirm(`Delete all tasks for "${currentUser}"?`)) return;
-      localStorage.removeItem(storageKeyForUser(currentUser));
-      // optionally remove from users list:
-      const users = loadUsers().filter(u => u !== currentUser);
+      // remove tasks key (uses normalized key)
+      const key = storageKeyForUser(currentUser);
+      if (key) localStorage.removeItem(key);
+      // remove from users list (case-insensitive)
+      const users = loadUsers().filter(u => normalizeKeyName(u) !== normalizeKeyName(currentUser));
       saveUsers(users);
       setCurrentUser(null);
       refreshUserSelector();
@@ -321,7 +395,15 @@
       const ids = new Set(existing.map(t => t.id));
       incoming.forEach(t => {
         if (!t.id) t.id = Date.now().toString() + Math.random().toString(36).slice(2,6);
-        if (!ids.has(t.id)) existing.push({ id:t.id, text: String(t.text || ''), done: !!t.done, createdAt: t.createdAt || new Date().toISOString() });
+        if (!ids.has(t.id)) {
+          existing.push({
+            id: t.id,
+            text: String(t.text || ''),
+            done: !!t.done,
+            createdAt: t.createdAt || new Date().toISOString()
+          });
+          ids.add(t.id);
+        }
       });
       saveTasks(currentUser, existing);
       importText.value = '';
@@ -332,8 +414,9 @@
 
     // Init
     refreshUserSelector();
-    // restore last user if available
-    const last = localStorage.getItem('last_local_user');
+    // restore last user if available (normalize)
+    const lastRaw = localStorage.getItem('last_local_user');
+    const last = normalizeDisplayName(lastRaw);
     if (last) setCurrentUser(last);
   </script>
 </body>
