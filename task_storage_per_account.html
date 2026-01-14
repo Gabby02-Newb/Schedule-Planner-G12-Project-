@@ -1,0 +1,340 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Tasks — Per-Account Local Storage (Offline)</title>
+  <style>
+    :root { --gap:12px; --muted:#666; --bg:#fff; --radius:8px; }
+    body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial; max-width:900px; margin:28px auto; padding:0 16px; color:#222; background: #f7f7f8; }
+    .card { background:var(--bg); border-radius:var(--radius); padding:18px; box-shadow:0 1px 0 rgba(0,0,0,0.04); margin-bottom:16px; }
+    header { display:flex; gap:var(--gap); align-items:center; justify-content:space-between; margin-bottom:8px; }
+    h1 { font-size:18px; margin:0; }
+    .account-area { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+    input[type="text"], select, textarea { padding:8px; font-size:14px; border:1px solid #ddd; border-radius:6px; }
+    button { padding:8px 10px; font-size:14px; border-radius:6px; border:1px solid #ccc; background:#fff; cursor:pointer; }
+    button.primary { background:#0b7cff; color:#fff; border-color:#0b7cff; }
+    #task-list { margin-top:12px; list-style:none; padding:0; }
+    #task-list li { display:flex; gap:8px; align-items:center; padding:10px 8px; border-bottom:1px solid #f0f0f0; }
+    .done { text-decoration:line-through; color:#777; }
+    .controls { margin-left:auto; display:flex; gap:8px; }
+    .muted { color:var(--muted); font-size:13px; }
+    .small { font-size:13px; padding:6px 8px; }
+    .toolbar { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+    footer { margin-top:12px; font-size:13px; color:var(--muted); }
+    .danger { border-color:#e04; color:#a00; background:#fff0f0; }
+    textarea { width:100%; min-height:80px; }
+    .export-area { display:none; margin-top:8px; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <header>
+      <h1>Schedule Planner — Offline, per-account</h1>
+      <div class="muted">Local only • No server required</div>
+    </header>
+
+    <div class="account-area">
+      <input id="username" type="text" placeholder="Enter username (local only)" />
+      <button id="loginBtn" class="primary">Login / Create</button>
+
+      <label for="switchAccount" class="muted">Switch:</label>
+      <select id="switchAccount"></select>
+
+      <button id="logoutBtn" class="small">Logout</button>
+      <button id="clearAccountBtn" class="small danger" title="Delete this account's tasks">Clear Account</button>
+    </div>
+    <div class="muted" style="margin-top:8px">Accounts and tasks are stored only in this browser profile. Anyone with access to the profile can view them.</div>
+  </div>
+
+  <div id="app" class="card" style="display:none;">
+    <div class="toolbar">
+      <input id="newTask" type="text" placeholder="Add a new task..." style="flex:1" />
+      <button id="addBtn" class="primary">Add</button>
+
+      <button id="exportBtn" class="small">Export</button>
+      <button id="importToggleBtn" class="small">Import</button>
+    </div>
+
+    <ul id="task-list" aria-live="polite"></ul>
+
+    <div class="export-area" id="exportArea">
+      <label class="muted">Exported JSON (copy to save):</label>
+      <textarea id="exportText" readonly></textarea>
+      <div style="margin-top:8px; display:flex; gap:8px;">
+        <button id="copyExport" class="small">Copy</button>
+        <button id="closeExport" class="small">Close</button>
+      </div>
+    </div>
+
+    <div class="export-area" id="importArea">
+      <label class="muted">Paste JSON to import into current account:</label>
+      <textarea id="importText" placeholder='[{"id":"...","text":"...", "done":false,"createdAt":"..."}]'></textarea>
+      <div style="margin-top:8px; display:flex; gap:8px;">
+        <button id="doImport" class="small primary">Import</button>
+        <button id="cancelImport" class="small">Cancel</button>
+      </div>
+    </div>
+
+    <div style="margin-top:10px" class="muted">Current account: <strong id="currentUserLabel"></strong></div>
+  </div>
+
+  <footer class="muted">Tip: If multiple people use the same device, use separate browser profiles to keep data private from each other.</footer>
+
+  <script>
+    // Keys
+    const USERS_KEY = 'local_users_v1';
+    function storageKeyForUser(username) { return 'tasks_' + encodeURIComponent(username); }
+
+    // Basic localStorage helpers
+    function loadUsers() {
+      try { return JSON.parse(localStorage.getItem(USERS_KEY)) || []; } catch (e) { return []; }
+    }
+    function saveUsers(list) { localStorage.setItem(USERS_KEY, JSON.stringify(list)); }
+    function ensureUserExists(u) {
+      if (!u) return;
+      const list = loadUsers();
+      if (!list.includes(u)) { list.push(u); saveUsers(list); }
+    }
+
+    function loadTasks(username) {
+      const raw = localStorage.getItem(storageKeyForUser(username));
+      if (!raw) return [];
+      try { return JSON.parse(raw) || []; } catch (e) { console.warn('Bad tasks JSON for', username); return []; }
+    }
+    function saveTasks(username, tasks) {
+      localStorage.setItem(storageKeyForUser(username), JSON.stringify(tasks));
+    }
+
+    // Elements
+    const usernameInput = document.getElementById('username');
+    const loginBtn = document.getElementById('loginBtn');
+    const switchSelect = document.getElementById('switchAccount');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const clearAccountBtn = document.getElementById('clearAccountBtn');
+
+    const app = document.getElementById('app');
+    const newTaskInput = document.getElementById('newTask');
+    const addBtn = document.getElementById('addBtn');
+    const taskList = document.getElementById('task-list');
+    const currentUserLabel = document.getElementById('currentUserLabel');
+
+    const exportBtn = document.getElementById('exportBtn');
+    const importToggleBtn = document.getElementById('importToggleBtn');
+    const exportArea = document.getElementById('exportArea');
+    const exportText = document.getElementById('exportText');
+    const copyExport = document.getElementById('copyExport');
+    const closeExport = document.getElementById('closeExport');
+
+    const importArea = document.getElementById('importArea');
+    const importText = document.getElementById('importText');
+    const doImport = document.getElementById('doImport');
+    const cancelImport = document.getElementById('cancelImport');
+
+    let currentUser = null;
+
+    // Populate user selector
+    function refreshUserSelector() {
+      const users = loadUsers();
+      switchSelect.innerHTML = '';
+      const placeholder = document.createElement('option');
+      placeholder.value = '';
+      placeholder.textContent = '-- choose account --';
+      switchSelect.appendChild(placeholder);
+      users.forEach(u => {
+        const opt = document.createElement('option');
+        opt.value = u;
+        opt.textContent = u;
+        switchSelect.appendChild(opt);
+      });
+    }
+
+    function setCurrentUser(username) {
+      currentUser = username || null;
+      if (currentUser) {
+        app.style.display = '';
+        currentUserLabel.textContent = currentUser;
+        usernameInput.value = '';
+        ensureUserExists(currentUser);
+        refreshUserSelector();
+        // select current in dropdown
+        for (const opt of switchSelect.options) opt.selected = (opt.value === currentUser);
+        renderTasks();
+        // store last user (optional)
+        localStorage.setItem('last_local_user', currentUser);
+      } else {
+        app.style.display = 'none';
+        currentUserLabel.textContent = '';
+        taskList.innerHTML = '';
+        localStorage.removeItem('last_local_user');
+      }
+    }
+
+    // Rendering and operations
+    function renderTasks() {
+      if (!currentUser) return;
+      const tasks = loadTasks(currentUser);
+      taskList.innerHTML = '';
+      if (tasks.length === 0) {
+        const li = document.createElement('li');
+        li.className = 'muted';
+        li.textContent = 'No tasks yet';
+        taskList.appendChild(li);
+        return;
+      }
+      tasks.forEach(task => {
+        const li = document.createElement('li');
+        const chk = document.createElement('input');
+        chk.type = 'checkbox';
+        chk.checked = !!task.done;
+        chk.addEventListener('change', () => {
+          task.done = chk.checked;
+          saveTasks(currentUser, tasks);
+          renderTasks();
+        });
+
+        const span = document.createElement('span');
+        span.textContent = task.text;
+        if (task.done) span.className = 'done';
+
+        const meta = document.createElement('small');
+        meta.className = 'muted';
+        meta.style.marginLeft = '8px';
+        meta.textContent = new Date(task.createdAt).toLocaleString();
+
+        const controls = document.createElement('div');
+        controls.className = 'controls';
+
+        const edit = document.createElement('button');
+        edit.textContent = 'Edit';
+        edit.className = 'small';
+        edit.addEventListener('click', () => {
+          const newText = prompt('Edit task text', task.text);
+          if (newText == null) return;
+          task.text = newText.trim();
+          saveTasks(currentUser, tasks);
+          renderTasks();
+        });
+
+        const del = document.createElement('button');
+        del.textContent = 'Delete';
+        del.className = 'small';
+        del.addEventListener('click', () => {
+          if (!confirm('Delete this task?')) return;
+          const filtered = loadTasks(currentUser).filter(t => t.id !== task.id);
+          saveTasks(currentUser, filtered);
+          renderTasks();
+        });
+
+        li.appendChild(chk);
+        li.appendChild(span);
+        li.appendChild(meta);
+        controls.appendChild(edit);
+        controls.appendChild(del);
+        li.appendChild(controls);
+        taskList.appendChild(li);
+      });
+    }
+
+    function addTask(text) {
+      if (!currentUser) return alert('No user selected');
+      const trimmed = (text || '').trim();
+      if (!trimmed) return;
+      const tasks = loadTasks(currentUser);
+      const newTask = {
+        id: Date.now().toString() + Math.random().toString(36).slice(2,6),
+        text: trimmed,
+        done: false,
+        createdAt: new Date().toISOString()
+      };
+      tasks.push(newTask);
+      saveTasks(currentUser, tasks);
+      renderTasks();
+    }
+
+    // Events
+    loginBtn.addEventListener('click', () => {
+      const name = usernameInput.value.trim();
+      if (!name) return alert('Enter a username');
+      setCurrentUser(name);
+    });
+
+    addBtn.addEventListener('click', () => {
+      addTask(newTaskInput.value);
+      newTaskInput.value = '';
+      newTaskInput.focus();
+    });
+    newTaskInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') { addTask(newTaskInput.value); newTaskInput.value=''; }
+    });
+
+    switchSelect.addEventListener('change', () => {
+      const chosen = switchSelect.value;
+      if (!chosen) return;
+      setCurrentUser(chosen);
+    });
+
+    logoutBtn.addEventListener('click', () => setCurrentUser(null));
+
+    clearAccountBtn.addEventListener('click', () => {
+      if (!currentUser) return alert('No user selected');
+      if (!confirm(`Delete all tasks for "${currentUser}"?`)) return;
+      localStorage.removeItem(storageKeyForUser(currentUser));
+      // optionally remove from users list:
+      const users = loadUsers().filter(u => u !== currentUser);
+      saveUsers(users);
+      setCurrentUser(null);
+      refreshUserSelector();
+    });
+
+    // Export / Import
+    exportBtn.addEventListener('click', () => {
+      if (!currentUser) return alert('No user selected');
+      const tasks = loadTasks(currentUser);
+      exportText.value = JSON.stringify(tasks, null, 2);
+      exportArea.style.display = 'block';
+      importArea.style.display = 'none';
+    });
+    copyExport.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(exportText.value);
+        alert('Copied to clipboard');
+      } catch (e) {
+        alert('Copy failed — select and copy manually');
+      }
+    });
+    closeExport.addEventListener('click', () => { exportArea.style.display='none'; });
+
+    importToggleBtn.addEventListener('click', () => {
+      importArea.style.display = importArea.style.display === 'block' ? 'none' : 'block';
+      exportArea.style.display = 'none';
+    });
+    cancelImport.addEventListener('click', () => { importArea.style.display='none'; importText.value=''; });
+
+    doImport.addEventListener('click', () => {
+      if (!currentUser) return alert('No user selected');
+      let incoming;
+      try { incoming = JSON.parse(importText.value); } catch (e) { alert('Invalid JSON'); return; }
+      if (!Array.isArray(incoming)) return alert('Import JSON must be an array of task objects');
+      // sanitize and merge: keep ids unique
+      const existing = loadTasks(currentUser);
+      const ids = new Set(existing.map(t => t.id));
+      incoming.forEach(t => {
+        if (!t.id) t.id = Date.now().toString() + Math.random().toString(36).slice(2,6);
+        if (!ids.has(t.id)) existing.push({ id:t.id, text: String(t.text || ''), done: !!t.done, createdAt: t.createdAt || new Date().toISOString() });
+      });
+      saveTasks(currentUser, existing);
+      importText.value = '';
+      importArea.style.display = 'none';
+      renderTasks();
+      alert('Import complete');
+    });
+
+    // Init
+    refreshUserSelector();
+    // restore last user if available
+    const last = localStorage.getItem('last_local_user');
+    if (last) setCurrentUser(last);
+  </script>
+</body>
+</html>
