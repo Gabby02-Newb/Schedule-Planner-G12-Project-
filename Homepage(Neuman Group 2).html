@@ -16,7 +16,7 @@
       /* full background image with fallback */
       background-color: #1f2937;
       background-image:
-        url('https://static.vecteezy.com/system/resources/previews/010/008/086/non_2x/background-dimension-3d-graphic-message-board-for-text-and-message-design-line-shadow-for-modern-web-design-free-vector.jpg');
+        url('https://static.vecteezy.com/system/resources/previews/010/008/086/non_2x/background-dimension-3d-graphic-message-board-for-text-and-message-design-line-shadow-for-modern-web-design-free-v[...]');
       background-repeat: no-repeat;
       background-position: center center;
       background-size: cover;
@@ -120,56 +120,23 @@
     <h1 id="welcomeTitle">Welcome to Your Schedule Planner</h1>
 
     <div class="button-container" role="navigation" aria-label="Main navigation">
-      <!-- Guide opens embedded modal (keeps user on homepage) -->
-      <button class="nav-button" id="openGuideBtn" aria-haspopup="dialog">
+      <!-- Guide now redirects to the Guide page (no modal) -->
+      <button class="nav-button" id="openGuideBtn" aria-label="Open Guide">
         <i class="fas fa-book-open" aria-hidden="true"></i>
         <p>Guide</p>
       </button>
 
       <!-- Planner nav -->
-      <button class="nav-button" id="openPlannerBtn">
+      <button class="nav-button" id="openPlannerBtn" aria-label="Open Schedule Planner">
         <i class="fas fa-calendar-alt" aria-hidden="true"></i>
         <p>Schedule Planner</p>
       </button>
 
       <!-- Info nav -->
-      <button class="nav-button" id="openInfoBtn">
+      <button class="nav-button" id="openInfoBtn" aria-label="Open Information">
         <i class="fas fa-info-circle" aria-hidden="true"></i>
         <p>Information</p>
       </button>
-    </div>
-  </div>
-
-  <!-- Guide Modal (embedded content) -->
-  <div id="guideModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="guideTitle" style="display:none;">
-    <div class="modal-panel" role="document" style="position:relative;">
-      <button class="modal-close" id="closeGuideBtn" aria-label="Close guide" style="position:absolute;top:12px;right:12px;background:transparent;border:none;font-size:28px;cursor:pointer;color:#111827;">&times;</button>
-      <h1 id="guideTitle">How to Use the Schedule Planner</h1>
-
-      <h2>Step 1: Create Your Schedule</h2>
-      <ul>
-        <li>Start by adding tasks or events to your planner.</li>
-        <li>Use color codes for different categories of tasks (e.g., study, meetings, personal).</li>
-        <li>Set reminders to ensure you don't miss important tasks.</li>
-      </ul>
-
-      <h2>Step 2: Prioritize Your Tasks</h2>
-      <ul>
-        <li>Use prioritization methods like the Eisenhower Matrix to organize tasks by urgency and importance.</li>
-        <li>Mark your high-priority tasks so you focus on them first.</li>
-      </ul>
-
-      <h2>Step 3: View and Adjust</h2>
-      <ul>
-        <li>Switch between daily, weekly, and monthly views to get a better understanding of your schedule.</li>
-        <li>Adjust tasks if your schedule changes, and ensure you're always on track.</li>
-      </ul>
-
-      <div style="text-align:center;margin-top:18px;">
-        <button class="nav-button" id="guideHomeBtn" style="display:inline-flex;align-items:center;gap:8px;">
-          <i class="fas fa-home" aria-hidden="true"></i><p>Back to Home</p>
-        </button>
-      </div>
     </div>
   </div>
 
@@ -184,13 +151,12 @@
 
       const logoutBtn = document.getElementById('logoutBtn');
       const openGuideBtn = document.getElementById('openGuideBtn');
-      const closeGuideBtn = document.getElementById('closeGuideBtn');
-      const guideModal = document.getElementById('guideModal');
-      const guideHomeBtn = document.getElementById('guideHomeBtn');
       const openPlannerBtn = document.getElementById('openPlannerBtn');
       const openInfoBtn = document.getElementById('openInfoBtn');
 
       // Navigation
+      // Guide now behaves like the other nav buttons and redirects to its own page
+      openGuideBtn.addEventListener('click', () => { window.location.href = 'Guide(Neuman Group 2).html'; });
       openPlannerBtn.addEventListener('click', () => { window.location.href = 'Interface(Numan Group 2).html'; });
       openInfoBtn.addEventListener('click', () => { window.location.href = 'Info(Neuman Group 2).html'; });
 
@@ -212,32 +178,6 @@
 
         // redirect to login
         setTimeout(() => { window.location.href = 'Login(Neuman Group 2).html'; }, 120);
-      });
-
-      // Guide modal
-      openGuideBtn.addEventListener('click', () => {
-        guideModal.style.display = 'flex';
-        closeGuideBtn.focus();
-      });
-      closeGuideBtn.addEventListener('click', () => {
-        guideModal.style.display = 'none';
-        openGuideBtn.focus();
-      });
-      guideModal.addEventListener('click', (e) => {
-        if (e.target === guideModal) {
-          guideModal.style.display = 'none';
-          openGuideBtn.focus();
-        }
-      });
-      window.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && guideModal.style.display === 'flex') {
-          guideModal.style.display = 'none';
-          openGuideBtn.focus();
-        }
-      });
-      guideHomeBtn?.addEventListener('click', () => {
-        guideModal.style.display = 'none';
-        openGuideBtn.focus();
       });
     });
   </script>
