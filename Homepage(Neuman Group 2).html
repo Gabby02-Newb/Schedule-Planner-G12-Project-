@@ -4,136 +4,300 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Home - Schedule Planner</title>
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
   <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
     html, body {
       height: 100%;
       margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
 
     body {
-      font-family: Arial, sans-serif;
-      /* background with gradient overlay + provided image */
-      background-color: #1f2937;
-      background-image:
-        linear-gradient(rgba(0,0,0,0.36), rgba(0,0,0,0.36)),
-        url('https://static.vecteezy.com/system/resources/previews/010/008/086/non_2x/background-dimension-3d-graphic-message-board-for-text-and-message-design-line-shadow-for-modern-web-design-free-vector.jpg');
-      background-repeat: no-repeat;
-      background-position: center center;
-      background-size: cover;
-      background-attachment: fixed;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       color: white;
       display: flex;
       justify-content: center;
       align-items: center;
+      min-height: 100vh;
+      position: relative;
+      overflow: hidden;
+      padding: 20px;
     }
 
-    /* main centered panel */
+    body::before {
+      content: '';
+      position: absolute;
+      width: 500px;
+      height: 500px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 50%;
+      top: -200px;
+      left: -200px;
+      animation: drift 20s ease-in-out infinite;
+    }
+
+    body::after {
+      content: '';
+      position: absolute;
+      width: 400px;
+      height: 400px;
+      background: rgba(255, 255, 255, 0.06);
+      border-radius: 50%;
+      bottom: -150px;
+      right: -100px;
+      animation: drift 25s ease-in-out infinite reverse;
+    }
+
+    @keyframes drift {
+      0%, 100% { transform: translate(0, 0); }
+      50% { transform: translate(30px, 30px); }
+    }
+
     .container {
-      background-color: rgba(0, 0, 0, 0.72);
-      padding: 48px;
-      border-radius: 12px;
-      width: 68%;
-      max-width: 1100px;
-      box-sizing: border-box;
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(20px);
+      padding: 60px 50px;
+      border-radius: 25px;
+      width: 100%;
+      max-width: 900px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
       text-align: center;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 20px;
-      /* give some top padding so fixed logout doesn't overlap on very small screens */
-      padding-top: 64px;
+      gap: 30px;
+      position: relative;
+      z-index: 10;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      animation: slideUp 0.8s ease-out;
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(40px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .header-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 10px;
+    }
+
+    .header-icon {
+      font-size: 60px;
+      background: rgba(255, 255, 255, 0.2);
+      width: 100px;
+      height: 100px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(10px);
     }
 
     h1 {
-      font-family: "Times New Roman", Times, serif;
-      color: white;
-      margin: 0 0 8px 0;
-      font-size: 36px;
+      font-size: 42px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      margin: 0;
+    }
+
+    .subtitle {
+      color: rgba(255, 255, 255, 0.8);
+      font-size: 16px;
+      font-weight: 300;
+      letter-spacing: 1px;
+      text-transform: uppercase;
     }
 
     .button-container {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 20px;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 25px;
       width: 100%;
+      margin-top: 20px;
     }
 
     .nav-button {
-      background-color: orange;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.05) 100%);
       color: white;
-      border: none;
-      padding: 20px;
-      border-radius: 10px;
+      border: 2px solid rgba(255, 255, 255, 0.25);
+      padding: 30px 25px;
+      border-radius: 15px;
       cursor: pointer;
       font-size: 18px;
-      transition: background-color 0.2s ease;
+      font-weight: 600;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 10px;
-      min-height: 80px;
+      gap: 15px;
+      min-height: 140px;
+      backdrop-filter: blur(10px);
+      position: relative;
+      overflow: hidden;
     }
-    .nav-button:hover { background-color: #ff9800; }
-    .nav-button i { font-size: 22px; }
-    .nav-button p { margin: 0; font-size: 16px; }
 
-    /* Logout button fixed to the viewport upper-right */
+    .nav-button::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.5s ease;
+    }
+
+    .nav-button:hover::before {
+      left: 100%;
+    }
+
+    .nav-button:hover {
+      border-color: rgba(255, 255, 255, 0.5);
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.1) 100%);
+      transform: translateY(-5px);
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    .nav-button:active {
+      transform: translateY(-2px);
+    }
+
+    .nav-button i {
+      font-size: 32px;
+    }
+
+    .nav-button p {
+      margin: 0;
+      font-size: 16px;
+    }
+
     #logoutBtn {
       position: fixed;
-      top: 14px;
-      right: 14px;
-      background-color: #ff6b6b;
+      top: 20px;
+      right: 20px;
+      background: linear-gradient(135deg, rgba(231, 76, 60, 0.9) 0%, rgba(192, 57, 43, 0.9) 100%);
       color: white;
-      border: none;
-      padding: 10px 14px;
-      border-radius: 8px;
+      border: 2px solid rgba(255, 255, 255, 0.15);
+      padding: 12px 24px;
+      border-radius: 12px;
       cursor: pointer;
       font-size: 14px;
+      font-weight: 600;
       display: flex;
       align-items: center;
       gap: 8px;
       z-index: 2000;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.35);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      backdrop-filter: blur(10px);
     }
-    #logoutBtn:hover { background-color: #ff4c4c; }
+
+    #logoutBtn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 25px rgba(0, 0, 0, 0.4);
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    #logoutBtn i {
+      font-size: 16px;
+    }
 
     @media (max-width: 900px) {
-      .container { width: 90%; padding: 36px; padding-top: 72px; }
-      .button-container { grid-template-columns: repeat(2, 1fr); }
-      .nav-button { min-height: 70px; font-size: 16px; }
+      .container {
+        padding: 40px 30px;
+      }
+
+      h1 {
+        font-size: 32px;
+      }
+
+      .button-container {
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+
+      .nav-button {
+        min-height: 120px;
+        padding: 25px 20px;
+      }
     }
 
     @media (max-width: 560px) {
-      .button-container { grid-template-columns: 1fr; }
-      .container { padding-top: 90px; }
+      .container {
+        padding: 30px 20px;
+      }
+
+      h1 {
+        font-size: 26px;
+      }
+
+      .header-icon {
+        width: 80px;
+        height: 80px;
+        font-size: 48px;
+      }
+
+      .nav-button {
+        min-height: 100px;
+        font-size: 16px;
+      }
+
+      .nav-button i {
+        font-size: 28px;
+      }
+
+      #logoutBtn {
+        padding: 10px 16px;
+        font-size: 12px;
+        top: 15px;
+        right: 15px;
+      }
     }
   </style>
 </head>
 <body>
-  <!-- Logout fixed in viewport upper-right -->
   <button id="logoutBtn" title="Log out" aria-label="Log out">
     <i class="fas fa-sign-out-alt" aria-hidden="true"></i>
-    <span>Log out</span>
+    <span>Logout</span>
   </button>
 
   <div class="container" role="main" aria-labelledby="welcomeTitle">
-    <h1 id="welcomeTitle">Welcome to Your Schedule Planner</h1>
+    <div class="header-section">
+      <div class="header-icon"><i class="fas fa-calendar-check"></i></div>
+      <h1 id="welcomeTitle">Welcome to Your Schedule</h1>
+      <p class="subtitle">Maximize your productivity</p>
+    </div>
 
     <div class="button-container" role="navigation" aria-label="Main navigation">
-      <!-- Guide now redirects to the Guide page (no modal) -->
       <button class="nav-button" id="openGuideBtn" aria-label="Open Guide">
         <i class="fas fa-book-open" aria-hidden="true"></i>
         <p>Guide</p>
       </button>
 
-      <!-- Planner nav -->
       <button class="nav-button" id="openPlannerBtn" aria-label="Open Schedule Planner">
         <i class="fas fa-calendar-alt" aria-hidden="true"></i>
         <p>Schedule Planner</p>
       </button>
 
-      <!-- Info nav -->
       <button class="nav-button" id="openInfoBtn" aria-label="Open Information">
         <i class="fas fa-info-circle" aria-hidden="true"></i>
         <p>Information</p>
@@ -145,7 +309,6 @@
     document.addEventListener('DOMContentLoaded', () => {
       const LOGGED_USER_KEY = 'loggedInUser_v1';
 
-      // BroadcastChannel (best-effort)
       let bc = null;
       try { bc = new BroadcastChannel('schedule_planner_channel'); }
       catch (err) { bc = null; }
@@ -155,29 +318,24 @@
       const openPlannerBtn = document.getElementById('openPlannerBtn');
       const openInfoBtn = document.getElementById('openInfoBtn');
 
-      // Navigation
-      // Guide now behaves like the other nav buttons and redirects to its own page
       openGuideBtn.addEventListener('click', () => { window.location.href = 'Guide(Neuman Group 2).html'; });
       openPlannerBtn.addEventListener('click', () => { window.location.href = 'Interface(Numan Group 2).html'; });
       openInfoBtn.addEventListener('click', () => { window.location.href = 'Info(Neuman Group 2).html'; });
 
-      // Logout logic
       logoutBtn.addEventListener('click', () => {
         try {
           localStorage.removeItem(LOGGED_USER_KEY);
-          // short "ping" so storage listeners get a change
-          try { localStorage.setItem('logoutPing', String(Date.now())); } catch (e) { /* ignore */ }
+          try { localStorage.setItem('logoutPing', String(Date.now())); } catch (e) { }
         } catch (err) { console.error(err); }
 
-        try { if (bc) bc.postMessage({ type: 'logout' }); } catch (err) { /* ignore */ }
+        try { if (bc) bc.postMessage({ type: 'logout' }); } catch (err) { }
 
         try {
           if (window.opener && typeof window.opener.onUserLogout === 'function') {
-            try { window.opener.onUserLogout(); } catch (e) { /* ignore */ }
+            window.opener.onUserLogout();
           }
-        } catch (e) { /* ignore */ }
+        } catch (e) { }
 
-        // redirect to login
         setTimeout(() => { window.location.href = 'Login(Neuman Group 2).html'; }, 120);
       });
     });
