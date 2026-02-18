@@ -683,7 +683,7 @@ function renderSmallPlans() {
     const div = document.createElement('div');
     div.className = 'small-plan';
     const left = document.createElement('div');
-    left.innerHTML = `<strong>${escapeHtml(p.title)}</strong><div style="font-size:0.85rem;color:#6b7280">${escapeHtml(p.description || '')}</div><small style="color:#6b7280">Priority: ${capitalize(p.priority || 'medium')}${p.oneTime ? ' · one-time' : ''}${p.acknowledged ? ' · acknowledged' : ''}</small>`;
+    left.innerHTML = `<strong>${escapeHtml(p.title)}</strong><div style="font-size:0.85rem;color:#6b7280">${escapeHtml(p.description || '')}</div><small style="color:#6b7280">Priority: ${capitalize(p.priority || 'medium')} ${p.oneTime ? '(one-time)' : '(recurring)'}</small>`;
     const right = document.createElement('div');
 
     const ackBtn = document.createElement('button');
@@ -825,34 +825,56 @@ function scheduleDailyCleanup() {
   }, msUntil);
 }
 
-// ------------- NOTIFICATIONS (in-page) -------------
+// ------------- NOTIFICATIONS (in-page) ✅ FIXED VERSION -----------
 let notifIntervals = [];
 let loggedInUser = localStorage.getItem(LOGGED_USER_KEY) || null;
 
 function onUserLogin(username) {
   loggedInUser = username;
   localStorage.setItem(LOGGED_USER_KEY, username);
+  console.log('✅ User logged in:', loggedInUser);
   startNotificationService();
 }
+
 function onUserLogout() {
   loggedInUser = null;
   localStorage.removeItem(LOGGED_USER_KEY);
+  console.log('⏸️ User logged out');
   stopNotificationService();
 }
 
 async function requestNotificationPermission() {
-  if (!('Notification' in window)) return false;
-  if (Notification.permission === 'granted') return true;
-  if (Notification.permission === 'denied') return false;
+  if (!('Notification' in window)) {
+    console.warn('⚠️ Notifications not supported in this browser');
+    return false;
+  }
+  if (Notification.permission === 'granted') {
+    console.log('✅ Notification permission already granted');
+    return true;
+  }
+  if (Notification.permission === 'denied') {
+    console.warn('⚠️ Notification permission denied by user');
+    return false;
+  }
   const result = await Notification.requestPermission();
+  console.log('📋 Notification permission request result:', result);
   return result === 'granted';
 }
+
 function notifyUser(title, body) {
-  if (Notification.permission !== 'granted') return;
+  if (Notification.permission !== 'granted') {
+    console.warn('⚠️ Notification permission not granted, cannot send notification');
+    return;
+  }
   try {
-    new Notification(title, { body });
+    console.log('🔔 Sending notification:', title, body);
+    new Notification(title, { 
+      body,
+      icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y="75" font-size="75">📅</text></svg>',
+      tag: 'schedule-planner-notification'
+    });
   } catch (e) {
-    console.error('Notification failed', e);
+    console.error('❌ Notification failed', e);
   }
 }
 
@@ -862,7 +884,8 @@ function markWeeklyTaskNotified(day, index) {
   list[index].lastNotified = new Date().toISOString();
   saveWeeklyTasks(days);
 }
-function shouldNotifyTaskWeekly(task, minGapMinutes = 10) {
+
+function shouldNotifyTaskWeekly(task, minGapMinutes = 2) {
   if (!task) return false;
   if (task.acknowledged) return false;
   if (!task.lastNotified) return true;
@@ -870,6 +893,7 @@ function shouldNotifyTaskWeekly(task, minGapMinutes = 10) {
   const diffMin = (Date.now() - last.getTime()) / 60000;
   return diffMin >= minGapMinutes;
 }
+
 function checkWeeklyTasksForPriority(priority, notifyGapMinutes) {
   if (!loggedInUser) return;
   const weekday = new Date().toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
@@ -884,7 +908,7 @@ function checkWeeklyTasksForPriority(priority, notifyGapMinutes) {
   });
 }
 
-function shouldNotifyCalendarTask(task, minGapMinutes = 10) {
+function shouldNotifyCalendarTask(task, minGapMinutes = 2) {
   if (!task) return false;
   if (task.acknowledged) return false;
   if (!task.lastNotified) return true;
@@ -892,11 +916,13 @@ function shouldNotifyCalendarTask(task, minGapMinutes = 10) {
   const diffMin = (Date.now() - last.getTime()) / 60000;
   return diffMin >= minGapMinutes;
 }
+
 function markCalendarTaskNotified(dateISO, idx) {
   if (!calendarTasks[dateISO] || !calendarTasks[dateISO][idx]) return;
   calendarTasks[dateISO][idx].lastNotified = new Date().toISOString();
   saveCalendarTasks(calendarTasks);
 }
+
 function checkCalendarTasksForPriority(priority, notifyGapMinutes) {
   if (!loggedInUser) return;
   const today = new Date().toISOString().split('T')[0];
@@ -916,33 +942,38 @@ function checkCalendarTasksForPriority(priority, notifyGapMinutes) {
 async function startNotificationService() {
   const ok = await requestNotificationPermission();
   if (!ok) {
-    console.warn('Notifications permission not granted.');
+    console.warn('⚠️ Notifications permission not granted.');
     return;
   }
+  console.log('✅ Notification permission granted. Starting notification service...');
   stopNotificationService();
 
-  // High: every 2 minutes
-  notifIntervals.push(setInterval(() => checkWeeklyTasksForPriority('high', 2), 2 * 60 * 1000));
-  notifIntervals.push(setInterval(() => checkCalendarTasksForPriority('high', 2), 2 * 60 * 1000));
+  // ✅ FIX: Updated intervals - High = 20 sec, Medium = 2 min, Low = 5 min
+  // High priority: every 20 seconds
+  notifIntervals.push(setInterval(() => checkWeeklyTasksForPriority('high', 0.33), 20 * 1000)); // 20 sec
+  notifIntervals.push(setInterval(() => checkCalendarTasksForPriority('high', 0.33), 20 * 1000));
 
-  // Medium: every 5 minutes
-  notifIntervals.push(setInterval(() => checkWeeklyTasksForPriority('medium', 5), 5 * 60 * 1000));
-  notifIntervals.push(setInterval(() => checkCalendarTasksForPriority('medium', 5), 5 * 60 * 1000));
+  // Medium priority: every 2 minutes
+  notifIntervals.push(setInterval(() => checkWeeklyTasksForPriority('medium', 2), 2 * 60 * 1000)); // 2 min
+  notifIntervals.push(setInterval(() => checkCalendarTasksForPriority('medium', 2), 2 * 60 * 1000));
 
-  // Low: every 10 minutes
-  notifIntervals.push(setInterval(() => checkWeeklyTasksForPriority('low', 10), 10 * 60 * 1000));
-  notifIntervals.push(setInterval(() => checkCalendarTasksForPriority('low', 10), 10 * 60 * 1000));
+  // Low priority: every 5 minutes
+  notifIntervals.push(setInterval(() => checkWeeklyTasksForPriority('low', 5), 5 * 60 * 1000)); // 5 min
+  notifIntervals.push(setInterval(() => checkCalendarTasksForPriority('low', 5), 5 * 60 * 1000));
 
-  // immediate check
-  checkWeeklyTasksForPriority('high', 2);
-  checkCalendarTasksForPriority('high', 2);
-  checkWeeklyTasksForPriority('medium', 5);
-  checkCalendarTasksForPriority('medium', 5);
-  checkWeeklyTasksForPriority('low', 10);
-  checkCalendarTasksForPriority('low', 10);
+  // immediate check on startup
+  console.log('✅ Running immediate notification checks...');
+  checkWeeklyTasksForPriority('high', 0.33);
+  checkCalendarTasksForPriority('high', 0.33);
+  checkWeeklyTasksForPriority('medium', 2);
+  checkCalendarTasksForPriority('medium', 2);
+  checkWeeklyTasksForPriority('low', 5);
+  checkCalendarTasksForPriority('low', 5);
+  console.log('✅ Notification intervals set - High: 20s, Medium: 2min, Low: 5min');
 }
 
 function stopNotificationService() {
+  console.log('⏸️ Stopping notification service...');
   notifIntervals.forEach(i => clearInterval(i));
   notifIntervals = [];
 }
@@ -960,11 +991,13 @@ window.onUserLogout = function() {
 window.addEventListener('storage', (e) => {
   if (e.key === LOGGED_USER_KEY) {
     if (e.newValue === null) {
-      // logged out in another tab
-      try { onUserLogout(); } catch (err) { console.warn('onUserLogout not defined', err); }
+      // ✅ Logged out in another tab
+      console.log('📡 Storage event: User logged out in another tab');
+      try { onUserLogout(); } catch (err) { console.warn('onUserLogout error', err); }
     } else {
-      // logged in in another tab
-      try { onUserLogin(e.newValue); } catch (err) { console.warn('onUserLogin not defined', err); }
+      // ✅ FIX: LOGIN detected in another tab - start notifications
+      console.log('📡 Storage event: User logged in in another tab:', e.newValue);
+      try { onUserLogin(e.newValue); } catch (err) { console.warn('onUserLogin error', err); }
     }
   }
 });
@@ -976,14 +1009,17 @@ try {
   bc.addEventListener('message', (ev) => {
     const msg = ev.data;
     if (!msg || !msg.type) return;
+    console.log('📡 BroadcastChannel message received:', msg.type);
     if (msg.type === 'logout') {
-      try { onUserLogout(); } catch (err) { console.warn('onUserLogout not defined', err); }
+      try { onUserLogout(); } catch (err) { console.warn('onUserLogout error', err); }
     } else if (msg.type === 'login' && msg.username) {
-      try { onUserLogin(msg.username); } catch (err) { console.warn('onUserLogin not defined', err); }
+      console.log('✅ Login signal received for user:', msg.username);
+      try { onUserLogin(msg.username); } catch (err) { console.warn('onUserLogin error', err); }
     }
   });
+  console.log('✅ BroadcastChannel "schedule_planner_channel" connected');
 } catch (e) {
-  console.warn('BroadcastChannel unavailable in this browser', e);
+  console.warn('⚠️ BroadcastChannel unavailable in this browser', e);
 }
 
 // Helper: allow Homepage to call planner.stop via opener reference (best-effort)
@@ -1009,10 +1045,15 @@ function init() {
 
   scheduleDailyCleanup();
 
-  // start notifications automatically if user already logged in
-  if (localStorage.getItem(LOGGED_USER_KEY)) {
-    loggedInUser = localStorage.getItem(LOGGED_USER_KEY);
+  // ✅ FIX: start notifications automatically if user already logged in
+  const storedUser = localStorage.getItem(LOGGED_USER_KEY);
+  if (storedUser) {
+    loggedInUser = storedUser;
+    console.log('✅ User already logged in:', loggedInUser);
+    console.log('🔔 Auto-starting notification service...');
     startNotificationService();
+  } else {
+    console.log('ℹ️ No user logged in yet');
   }
 }
 
