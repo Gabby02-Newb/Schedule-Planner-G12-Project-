@@ -2,234 +2,477 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Login / Signup</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login - Schedule Planner</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f2f2f2;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
+    * {
       margin: 0;
-    }
-
-    .auth-container {
-      background-color: #fff;
-      padding: 40px 30px;
-      border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      width: 360px;
-    }
-
-    h2 { text-align: center; margin-bottom: 20px; }
-    label { display: block; margin-bottom: 5px; font-weight: bold; color: #333; }
-    input[type="text"], input[type="password"], input[type="email"] {
-      width: 100%; padding: 10px; margin: 6px 0 14px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;
-    }
-
-    .password-wrapper {
-      position: relative;
-      width: 100%;
-    }
-    .password-wrapper input {
-      width: 100%;
-      padding: 10px;
-      padding-right: 40px; /* leave space for toggle button */
-      border: 1px solid #ccc;
-      border-radius: 4px;
+      padding: 0;
       box-sizing: border-box;
     }
-    .toggle-password {
+
+    html, body {
+      height: 100%;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f5f7fa;
+    }
+
+    body {
+      display: flex;
+      justify-content: stretch;
+      align-items: stretch;
+      min-height: 100vh;
+    }
+
+    /* LEFT SIDE - MARKETING */
+    .left-side {
+      flex: 1;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      padding: 60px 40px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .left-side::before {
+      content: '';
       position: absolute;
-      right: 4px;
-      top: 50%;
-      transform: translateY(-50%);
-      background: transparent;
-      border: none;
-      cursor: pointer;
-      color: #666;
-      width: 32px;
-      height: 32px;
+      width: 400px;
+      height: 400px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      top: -100px;
+      left: -100px;
+      animation: float 20s ease-in-out infinite;
+    }
+
+    .left-side::after {
+      content: '';
+      position: absolute;
+      width: 300px;
+      height: 300px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 50%;
+      bottom: -50px;
+      right: -100px;
+      animation: float 25s ease-in-out infinite reverse;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(30px); }
+    }
+
+    .left-content {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      max-width: 400px;
+    }
+
+    .brand-logo {
+      font-size: 72px;
+      margin-bottom: 25px;
+      display: inline-block;
+      background: rgba(255, 255, 255, 0.2);
+      padding: 30px;
+      border-radius: 20px;
+      backdrop-filter: blur(10px);
+    }
+
+    .left-side h1 {
+      font-size: 42px;
+      font-weight: 700;
+      margin-bottom: 20px;
+      letter-spacing: -1px;
+    }
+
+    .left-side p {
+      font-size: 18px;
+      line-height: 1.6;
+      color: rgba(255, 255, 255, 0.9);
+      margin-bottom: 30px;
+    }
+
+    .features {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      align-items: flex-start;
+      margin-top: 40px;
+    }
+
+    .feature-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 15px;
+    }
+
+    .feature-item i {
+      font-size: 20px;
+      background: rgba(255, 255, 255, 0.2);
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 0;
     }
-    .toggle-password:focus { outline: 2px solid #85b7ff; outline-offset: 2px; }
 
-    input[type="submit"], .toggle-btn, .debug-btn {
-      width: 100%; background-color: #4CAF50; color: white; padding: 10px;
-      border: none; border-radius: 4px; cursor: pointer; font-size: 1em; margin-top: 6px;
+    /* RIGHT SIDE - LOGIN FORM */
+    .right-side {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 40px;
+      background: #f5f7fa;
     }
-    input[type="submit"]:hover, .toggle-btn:hover, .debug-btn:hover { background-color: #45a049; }
 
-    .small { text-align: center; font-size: 0.9em; color: #666; margin-top: 10px; }
-    .link { color: #007bff; cursor: pointer; text-decoration: underline; }
-    #message { text-align: center; margin-top: 10px; font-size: 0.95em; }
-    .hidden { display: none; }
-    .field-error { color: #b00020; font-size: 0.9em; margin: -10px 0 10px; }
+    .login-container {
+      background: white;
+      padding: 50px 40px;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 450px;
+      animation: slideIn 0.6s ease-out;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateX(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    .login-header {
+      text-align: center;
+      margin-bottom: 35px;
+    }
+
+    .login-logo {
+      font-size: 48px;
+      margin-bottom: 15px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .login-container h2 {
+      font-size: 28px;
+      font-weight: 700;
+      color: #333;
+      margin-bottom: 8px;
+    }
+
+    .login-subtitle {
+      color: #999;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .form-group {
+      margin-bottom: 22px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: #333;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    input[type="text"],
+    input[type="password"] {
+      width: 100%;
+      padding: 14px 16px;
+      border: 2px solid #e0e0e0;
+      border-radius: 12px;
+      font-size: 16px;
+      transition: all 0.3s ease;
+      background: #f8f9fa;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    input[type="text"]:focus,
+    input[type="password"]:focus {
+      outline: none;
+      border-color: #667eea;
+      background: white;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    input[type="submit"] {
+      width: 100%;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 14px 20px;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 16px;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+      margin-top: 10px;
+    }
+
+    input[type="submit"]:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 30px rgba(102, 126, 234, 0.4);
+    }
+
+    input[type="submit"]:active {
+      transform: translateY(-1px);
+    }
+
+    .form-footer {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 14px;
+      color: #666;
+    }
+
+    .form-footer a {
+      color: #667eea;
+      text-decoration: none;
+      font-weight: 600;
+      transition: color 0.3s ease;
+    }
+
+    .form-footer a:hover {
+      color: #764ba2;
+      text-decoration: underline;
+    }
+
+    #message {
+      margin-top: 15px;
+      padding: 12px 14px;
+      border-radius: 10px;
+      text-align: center;
+      font-weight: 600;
+      font-size: 14px;
+      display: none;
+      animation: slideDown 0.4s ease-out;
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .success-message {
+      background: rgba(46, 204, 113, 0.1);
+      color: #27ae60;
+      border-left: 3px solid #27ae60;
+    }
+
+    .error-message {
+      background: rgba(231, 76, 60, 0.1);
+      color: #e74c3c;
+      border-left: 3px solid #e74c3c;
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 1024px) {
+      .left-side {
+        padding: 40px 30px;
+      }
+
+      .left-side h1 {
+        font-size: 36px;
+      }
+
+      .login-container {
+        padding: 40px 30px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      body {
+        flex-direction: column;
+      }
+
+      .left-side {
+        padding: 40px 30px;
+        min-height: auto;
+      }
+
+      .right-side {
+        padding: 30px 20px;
+      }
+
+      .left-side h1 {
+        font-size: 32px;
+      }
+
+      .left-side p {
+        font-size: 16px;
+      }
+
+      .features {
+        display: none;
+      }
+
+      .login-container {
+        padding: 30px 25px;
+      }
+
+      .login-container h2 {
+        font-size: 24px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .left-side {
+        padding: 30px 20px;
+      }
+
+      .right-side {
+        padding: 20px 15px;
+      }
+
+      .login-container {
+        padding: 25px 20px;
+      }
+
+      input[type="text"],
+      input[type="password"] {
+        padding: 12px 14px;
+        font-size: 16px;
+      }
+
+      input[type="submit"] {
+        padding: 12px 18px;
+      }
+    }
   </style>
 </head>
 <body>
-
-<div class="auth-container">
-  <div id="loginPanel">
-    <h2>Login</h2>
-    <form id="loginForm">
-      <label for="loginUsername">Username</label>
-      <input type="text" id="loginUsername" name="username" placeholder="Enter your username" required>
-
-      <label for="loginPassword">Password</label>
-      <div class="password-wrapper">
-        <input type="password" id="loginPassword" name="password" placeholder="Enter your password" required>
-        <button type="button" class="toggle-password" id="toggleLoginPassword" aria-pressed="false" aria-label="Show password"></button>
+  <!-- LEFT SIDE - MARKETING -->
+  <div class="left-side">
+    <div class="left-content">
+      <div class="brand-logo">
+        <i class="fas fa-calendar-check"></i>
       </div>
+      <h1>Schedule Planner</h1>
+      <p>Take control of your time and boost your productivity</p>
 
-      <input type="submit" value="Login">
-    </form>
-    <p id="loginMessage" class="small" aria-live="polite"></p>
-    <p class="small">Don't have an account? <span id="showSignup" class="link">Sign up</span></p>
+      <div class="features">
+        <div class="feature-item">
+          <i class="fas fa-check-circle"></i>
+          <span>Easy Task Management</span>
+        </div>
+        <div class="feature-item">
+          <i class="fas fa-bell"></i>
+          <span>Smart Reminders</span>
+        </div>
+        <div class="feature-item">
+          <i class="fas fa-chart-line"></i>
+          <span>Track Progress</span>
+        </div>
+        <div class="feature-item">
+          <i class="fas fa-sync"></i>
+          <span>Sync Everywhere</span>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <div id="signupPanel" class="hidden">
-    <h2>Sign up</h2>
-    <form id="signupForm">
-      <label for="signupUsername">Username</label>
-      <input type="text" id="signupUsername" name="username" placeholder="Pick a username" required>
-
-      <label for="signupPassword">Password</label>
-      <div class="password-wrapper">
-        <input type="password" id="signupPassword" name="password" placeholder="Choose a password (min 6 chars)" required>
-        <button type="button" class="toggle-password" id="toggleSignupPassword" aria-pressed="false" aria-label="Show password"></button>
+  <!-- RIGHT SIDE - LOGIN -->
+  <div class="right-side">
+    <div class="login-container">
+      <div class="login-header">
+        <div class="login-logo">
+          <i class="fas fa-calendar-check"></i>
+        </div>
+        <h2>Welcome Back</h2>
+        <p class="login-subtitle">Login to your account</p>
       </div>
 
-      <label for="signupConfirmPassword">Confirm Password</label>
-      <div class="password-wrapper">
-        <input type="password" id="signupConfirmPassword" name="confirmPassword" placeholder="Re-enter your password" required>
-        <button type="button" class="toggle-password" id="toggleSignupConfirmPassword" aria-pressed="false" aria-label="Show password"></button>
-      </div>
+      <form onsubmit="return checkLogin()">
+        <div class="form-group">
+          <label for="loginUsername">Username</label>
+          <input type="text" id="loginUsername" name="username" placeholder="Enter your username" required>
+        </div>
 
-      <div id="signupError" class="field-error" aria-live="polite"></div>
-      <input type="submit" value="Create account">
-    </form>
-    <p id="signupMessage" class="small" aria-live="polite"></p>
-    <p class="small">Already have an account? <span id="showLogin" class="link">Login</span></p>
+        <div class="form-group">
+          <label for="loginPassword">Password</label>
+          <input type="password" id="loginPassword" name="password" placeholder="Enter your password" required>
+        </div>
+
+        <input type="submit" value="Login">
+
+        <p id="message"></p>
+      </form>
+
+      <div class="form-footer">
+        Don't have an account? <a href="#" onclick="alert('Sign up feature coming soon!')">Create one</a>
+      </div>
+    </div>
   </div>
 
-  <div id="message" aria-live="polite"></div>
-</div>
+  <script>
+    const LOGGED_USER_KEY = 'loggedInUser_v1';
 
-<script>
-const LOGGED_USER_KEY = 'loggedInUser_v1';
+    async function hashPassword(password) {
+      const data = new TextEncoder().encode(password);
+      const hash = await crypto.subtle.digest('SHA-256', data);
+      return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join('');
+    }
 
-async function hashPassword(password) {
-  const data = new TextEncoder().encode(password);
-  const hash = await crypto.subtle.digest('SHA-256', data);
-  return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2,'0')).join('');
-}
+    function getStoredUsers() {
+      try { return JSON.parse(localStorage.getItem('users') || '{}'); }
+      catch { return {}; }
+    }
 
-function getStoredUsers() {
-  try { return JSON.parse(localStorage.getItem('users') || '{}'); } 
-  catch { return {}; }
-}
-function saveStoredUsers(users) { localStorage.setItem('users', JSON.stringify(users)); }
+    function checkLogin() {
+      const user = document.getElementById("loginUsername").value.trim();
+      const pass = document.getElementById("loginPassword").value;
+      const msg = document.getElementById("message");
 
-const loginPanel = document.getElementById('loginPanel');
-const signupPanel = document.getElementById('signupPanel');
-const showSignup = document.getElementById('showSignup');
-const showLogin = document.getElementById('showLogin');
-const loginForm = document.getElementById('loginForm');
-const signupForm = document.getElementById('signupForm');
-const loginMessage = document.getElementById('loginMessage');
-const signupMessage = document.getElementById('signupMessage');
-const signupError = document.getElementById('signupError');
+      if (user === "admin" && pass === "1234") {
+        localStorage.setItem(LOGGED_USER_KEY, user);
+        msg.classList.add('success-message');
+        msg.textContent = '✓ Login successful! Redirecting...';
+        msg.style.display = 'block';
 
-showSignup.addEventListener('click', () => {
-  loginPanel.classList.add('hidden');
-  signupPanel.classList.remove('hidden');
-  signupError.textContent = signupMessage.textContent = loginMessage.textContent = '';
-  signupForm.reset();
-});
+        setTimeout(() => {
+          window.location.href = "Homepage(Neuman Group 2).html";
+        }, 1200);
+      } else {
+        msg.classList.remove('success-message');
+        msg.classList.add('error-message');
+        msg.textContent = '✗ Incorrect username or password';
+        msg.style.display = 'block';
+      }
 
-showLogin.addEventListener('click', () => {
-  signupPanel.classList.add('hidden');
-  loginPanel.classList.remove('hidden');
-  loginForm.reset();
-  signupMessage.textContent = loginMessage.textContent = signupError.textContent = '';
-});
-
-signupForm.addEventListener('submit', async e => {
-  e.preventDefault();
-  signupError.textContent = signupMessage.textContent = '';
-  const username = signupForm.username.value.trim();
-  const password = signupForm.password.value;
-  const confirm = signupForm.confirmPassword.value;
-  if (!username) return signupError.textContent = 'Username cannot be empty.';
-  if (password.length < 6) return signupError.textContent = 'Password must be at least 6 characters.';
-  if (password !== confirm) return signupError.textContent = 'Passwords do not match.';
-
-  const users = getStoredUsers();
-  if (users[username]) return signupError.textContent = 'Username already taken.';
-
-  try {
-    const hashed = await hashPassword(password);
-    users[username] = hashed;
-    saveStoredUsers(users);
-    signupMessage.style.color = 'green';
-    signupMessage.textContent = 'Account created! Redirecting to login...';
-    setTimeout(() => {
-      signupPanel.classList.add('hidden');
-      loginPanel.classList.remove('hidden');
-      signupForm.reset();
-      signupMessage.textContent = '';
-    }, 900);
-  } catch {
-    signupMessage.style.color = 'red';
-    signupMessage.textContent = 'Error creating account.';
-  }
-});
-
-loginForm.addEventListener('submit', async e => {
-  e.preventDefault();
-  loginMessage.textContent = '';
-  const username = loginForm.username.value.trim();
-  const password = loginForm.password.value;
-  const users = getStoredUsers();
-  if (!users[username]) return loginMessage.style.color='red', loginMessage.textContent='Incorrect username or password.';
-  const hashed = await hashPassword(password);
-  if (users[username] === hashed) {
-    localStorage.setItem(LOGGED_USER_KEY, username);
-    loginMessage.style.color = 'green';
-    loginMessage.textContent = 'Login successful! Redirecting...';
-    setTimeout(() => window.location.href = "Homepage(Neuman Group 2).html", 700);
-  } else {
-    loginMessage.style.color = 'red';
-    loginMessage.textContent = 'Incorrect username or password.';
-  }
-});
-
-// Password toggle
-(function(){
-  const eyeOpen = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 5C7 5 2.73 8.11 1 12c1.73 3.89 6 7 11 7s9.27-3.11 11-7c-1.73-3.89-6-7-11-7z" stroke="#666" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="3" stroke="#666" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
-  const eyeClosed = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M17.94 17.94A10.94 10.94 0 0 1 12 19c-5 0-9.27-3.11-11-7 .7-1.57 1.86-3 3.27-4.2" stroke="#666" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M1 1l22 22" stroke="#666" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M9.53 9.53A3 3 0 0 0 14.47 14.47" stroke="#666" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
-  function toggle(btnId, inputId){
-    const btn = document.getElementById(btnId);
-    const input = document.getElementById(inputId);
-    if (!btn || !input) return;
-    btn.innerHTML = eyeOpen;
-    btn.addEventListener('click', () => {
-      const hidden = input.type==='password';
-      input.type = hidden ? 'text':'password';
-      btn.innerHTML = hidden ? eyeClosed:eyeOpen;
-      input.focus();
-    });
-  }
-  toggle('toggleLoginPassword','loginPassword');
-  toggle('toggleSignupPassword','signupPassword');
-  toggle('toggleSignupConfirmPassword','signupConfirmPassword');
-})();
-</script>
+      return false;
+    }
+  </script>
 </body>
 </html>
