@@ -4,87 +4,237 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Guide - Schedule Planner</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
   <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
     body {
-      font-family: Arial, sans-serif;
-      background-image: url('https://static.vecteezy.com/system/resources/previews/010/008/086/non_2x/background-dimension-3d-graphic-message-board-for-text-and-message-design-line-shadow-for-modern-web-design-free-vector.jpg');
-      background-repeat: no-repeat;
-      background-position: center center;
-      background-size: cover;
-      color: black;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #333;
+      min-height: 100vh;
+      padding: 20px;
+      position: relative;
+    }
+
+    body::before {
+      content: '';
+      position: absolute;
+      width: 400px;
+      height: 400px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 50%;
+      top: -100px;
+      left: -100px;
+      pointer-events: none;
     }
 
     .container {
-      background-color: rgba(255, 255, 255, 0.85);
-      padding: 40px 30px;
-      border-radius: 10px;
-      width: 80%;
-      margin-top: 80px;
-      text-align: left;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      padding: 50px 45px;
+      border-radius: 20px;
+      max-width: 900px;
+      margin: 80px auto 40px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+      position: relative;
+      z-index: 10;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      animation: slideUp 0.8s ease-out;
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(40px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     h1 {
-      font-family: Algerian, serif;
-      color: black;
+      font-size: 36px;
+      font-weight: 700;
+      color: #333;
       text-align: center;
+      margin-bottom: 40px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    h2 {
+      font-size: 22px;
+      font-weight: 600;
+      color: #333;
+      margin-top: 35px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid #f0f0f0;
+    }
+
+    h2::before {
+      content: '';
+      display: inline-block;
+      width: 5px;
+      height: 20px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 3px;
     }
 
     ul {
-      list-style-type: disc;
-      margin-left: 40px;
-      font-size: 1.1em;
+      list-style: none;
+      margin-left: 0;
+    }
+
+    li {
+      padding: 14px 0 14px 30px;
+      position: relative;
+      font-size: 16px;
+      line-height: 1.7;
+      color: #555;
+      border-bottom: 1px solid #f5f5f5;
+      transition: all 0.3s ease;
+    }
+
+    li:last-child {
+      border-bottom: none;
+    }
+
+    li::before {
+      content: '→';
+      position: absolute;
+      left: 0;
+      color: #667eea;
+      font-weight: bold;
+      font-size: 18px;
+    }
+
+    li:hover {
+      padding-left: 40px;
+      color: #333;
     }
 
     .button-container {
       text-align: center;
-      margin-top: 30px;
+      margin-top: 50px;
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      flex-wrap: wrap;
     }
 
     .nav-button {
-      background-color: orange;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       color: white;
       border: none;
-      padding: 12px 24px;
-      border-radius: 5px;
+      padding: 14px 32px;
+      border-radius: 12px;
       cursor: pointer;
       font-size: 16px;
-      transition: background-color 0.3s ease;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
     }
 
     .nav-button:hover {
-      background-color: darkred;
+      transform: translateY(-3px);
+      box-shadow: 0 12px 30px rgba(102, 126, 234, 0.4);
+    }
+
+    .nav-button:active {
+      transform: translateY(-1px);
+    }
+
+    .nav-button i {
+      font-size: 18px;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        padding: 35px 25px;
+        margin-top: 60px;
+      }
+
+      h1 {
+        font-size: 28px;
+      }
+
+      h2 {
+        font-size: 20px;
+      }
+
+      li {
+        font-size: 15px;
+        padding: 12px 0 12px 26px;
+      }
+
+      .nav-button {
+        padding: 12px 24px;
+        font-size: 14px;
+      }
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>How to Use the Schedule Planner</h1>
+    <h1><i class="fas fa-book-open" style="margin-right: 15px;"></i>How to Use the Schedule Planner</h1>
 
     <h2>Step 1: Create Your Schedule</h2>
     <ul>
-      <li>Start by adding tasks or events to your planner.</li>
-      <li>Use color codes for different categories of tasks (e.g., study, meetings, personal).</li>
-      <li>Set reminders to ensure you don't miss important tasks.</li>
+      <li><strong>Add tasks or events</strong> to your planner with specific dates and times.</li>
+      <li><strong>Use color codes</strong> for different categories (Study, Meetings, Personal, etc.).</li>
+      <li><strong>Set reminders</strong> to ensure you don't miss important tasks.</li>
+      <li><strong>Add descriptions</strong> to provide context and details for each task.</li>
     </ul>
 
     <h2>Step 2: Prioritize Your Tasks</h2>
     <ul>
-      <li>Use prioritization methods like the Eisenhower Matrix to organize tasks by urgency and importance.</li>
-      <li>Mark your high-priority tasks so you focus on them first.</li>
+      <li><strong>Use prioritization methods</strong> like the Eisenhower Matrix to organize by urgency and importance.</li>
+      <li><strong>Mark high-priority tasks</strong> so you focus on them first.</li>
+      <li><strong>Break down large tasks</strong> into smaller, manageable subtasks.</li>
+      <li><strong>Set realistic deadlines</strong> to avoid overwhelming yourself.</li>
     </ul>
 
     <h2>Step 3: View and Adjust</h2>
     <ul>
-      <li>Switch between daily, weekly, and monthly views to get a better understanding of your schedule.</li>
-      <li>Adjust tasks if your schedule changes, and ensure you're always on track.</li>
+      <li><strong>Switch between daily, weekly, and monthly views</strong> for better schedule visualization.</li>
+      <li><strong>Adjust tasks</strong> when your schedule changes to stay on track.</li>
+      <li><strong>Review completed tasks</strong> to track your progress and productivity.</li>
+      <li><strong>Plan ahead</strong> for upcoming weeks to prevent last-minute rushes.</li>
+    </ul>
+
+    <h2>Best Practices</h2>
+    <ul>
+      <li><strong>Check your planner daily</strong> to stay organized and focused.</li>
+      <li><strong>Use time blocking</strong> to allocate specific time for each task.</li>
+      <li><strong>Build routine</strong> with recurring tasks for consistent productivity.</li>
+      <li><strong>Celebrate wins</strong> by acknowledging completed tasks.</li>
     </ul>
 
     <div class="button-container">
-      <a href="Homepage(Neuman Group 2).html">
-        <button class="nav-button">Home</button>
-      </a>
+      <button class="nav-button" onclick="window.location.href='Homepage(Neuman Group 2).html'">
+        <i class="fas fa-home"></i> Home
+      </button>
+      <button class="nav-button" onclick="window.location.href='Interface(Numan Group 2).html'">
+        <i class="fas fa-calendar-alt"></i> Go to Planner
+      </button>
     </div>
   </div>
-
 </body>
 </html>
