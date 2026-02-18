@@ -4,139 +4,278 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Information - Schedule Planner</title>
-
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
   <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
     body {
-      background-image: url("https://static.vecteezy.com/system/resources/previews/010/008/086/non_2x/background-dimension-3d-graphic-message-board-for-text-and-message-design-line-shadow-for-modern-web-design-free-vector.jpg");
-      background-size: cover;
-      background-repeat: no-repeat;
-      background-position: top;
-      color: black;
-      text-align: center;
-      padding-top: 100px;
-      font-family: Arial, sans-serif;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #333;
+      min-height: 100vh;
+      padding: 20px;
+      position: relative;
+    }
+
+    body::before {
+      content: '';
+      position: absolute;
+      width: 400px;
+      height: 400px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 50%;
+      top: -100px;
+      left: -100px;
+      pointer-events: none;
     }
 
     .container {
-      background-color: rgba(255, 255, 255, 0.9);
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
       margin: 50px auto;
-      padding: 30px;
-      width: 80%;
-      border-radius: 12px;
+      padding: 45px;
+      width: 100%;
+      max-width: 900px;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
       text-align: left;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      position: relative;
+      z-index: 10;
+      animation: slideUp 0.8s ease-out;
     }
 
-    h1, h2 {
-      font-family: Algerian, serif;
-      color: orange;
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(40px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    h1 {
+      font-size: 32px;
+      font-weight: 700;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
       text-align: center;
+      margin-bottom: 30px;
     }
 
-    img {
-      width: 150px;
-      height: 120px;
-      display: block;
-      margin: 0 auto 25px;
+    h2 {
+      font-size: 22px;
+      font-weight: 600;
+      color: #333;
+      margin: 30px 0 18px 0;
+      padding-bottom: 12px;
+      border-bottom: 2px solid #f0f0f0;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    h2::before {
+      content: '';
+      display: inline-block;
+      width: 4px;
+      height: 24px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 2px;
     }
 
     ul {
-      list-style-type: disc;
-      margin-left: 40px;
-      line-height: 1.6;
+      list-style: none;
+      margin-left: 0;
+    }
+
+    li {
+      padding: 12px 0 12px 28px;
+      position: relative;
+      line-height: 1.8;
+      color: #555;
+      border-bottom: 1px solid #f5f5f5;
+      font-size: 15px;
+    }
+
+    li:last-child {
+      border-bottom: none;
+    }
+
+    li::before {
+      content: '✓';
+      position: absolute;
+      left: 0;
+      color: #667eea;
+      font-weight: bold;
+      font-size: 16px;
+    }
+
+    li strong {
+      color: #333;
+    }
+
+    .section {
+      display: none;
+      animation: fadeIn 0.4s ease-in;
+    }
+
+    .section.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
     }
 
     .button-container {
       display: flex;
       justify-content: space-between;
-      margin-top: 30px;
+      gap: 15px;
+      margin-top: 45px;
+      flex-wrap: wrap;
     }
 
     .nav-button {
-      background-color: orange;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       color: white;
       border: none;
-      padding: 12px 24px;
-      border-radius: 6px;
+      padding: 12px 28px;
+      border-radius: 12px;
       cursor: pointer;
-      font-size: 16px;
-      transition: 0.3s;
+      font-size: 15px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      flex: 1;
+      min-width: 140px;
+      justify-content: center;
     }
 
     .nav-button:hover {
-      background-color: #d68500;
+      transform: translateY(-3px);
+      box-shadow: 0 12px 30px rgba(102, 126, 234, 0.4);
     }
 
-    .section {
-      display: none;
+    .nav-button:active {
+      transform: translateY(-1px);
     }
 
-    .active {
-      display: block;
+    .slide-indicator {
+      text-align: center;
+      margin-top: 20px;
+      color: #999;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        padding: 30px 25px;
+        margin-top: 30px;
+      }
+
+      h1 {
+        font-size: 26px;
+      }
+
+      h2 {
+        font-size: 20px;
+      }
+
+      .button-container {
+        flex-direction: column;
+      }
+
+      .nav-button {
+        width: 100%;
+        min-width: auto;
+      }
     }
   </style>
 </head>
-
 <body>
   <div class="container">
-
-    <!-- Image -->
-    <img src="https://cdn-icons-png.flaticon.com/512/1827/1827504.png" alt="Schedule Planner Icon" />
-
     <!-- SECTION 1 -->
     <div class="section active" id="section-1">
-      <h1>WHAT IS THE TOPIC ABOUT</h1>
+      <h1>What is the Topic About?</h1>
+
       <ul>
-        <li>The topic focuses on the effectiveness of a web-based schedule planner for student time management.</li>
-        <li>A schedule planner organizes and allocates time for specific tasks or subjects.</li>
-        <li>Examples: Google Calendar, Notion, Trello, MyStudyLife.</li>
-        <li>Features include reminders, color coding, time blocking, and integration tools.</li>
-        <li>Helps improve prioritization, routine, and productivity.</li>
+        <li><strong>Effectiveness of web-based schedule planning</strong> for student time management.</li>
+        <li><strong>Schedule planner definition:</strong> A system that organizes and allocates time for specific tasks or subjects.</li>
+        <li><strong>Popular examples:</strong> Google Calendar, Notion, Trello, MyStudyLife.</li>
+        <li><strong>Key features:</strong> Reminders, color coding, time blocking, and integration tools.</li>
+        <li><strong>Benefits achieved:</strong> Improved prioritization, better routines, and increased productivity.</li>
       </ul>
     </div>
 
     <!-- SECTION 2 -->
     <div class="section" id="section-2">
-      <h2>MAIN TOPIC</h2>
+      <h1>Main Topic</h1>
+
       <ul>
-        <li><strong>Definition:</strong> A system used to organize time and manage tasks.</li>
-        <li><strong>Purpose:</strong> Improve time management, productivity, reduce stress, and track goals.</li>
-        <li><strong>Types:</strong> Manual planners, digital apps, academic planners, work planners.</li>
-        <li><strong>Key Features:</strong> Time blocking, reminders, sync, automatic updates.</li>
-        <li><strong>Benefits:</strong> Routine building, focus enhancement, long-term planning, work-life balance.</li>
+        <li><strong>Definition:</strong> A comprehensive system used to organize time and manage tasks effectively.</li>
+        <li><strong>Primary purpose:</strong> Improve time management, boost productivity, reduce stress, and track goals.</li>
+        <li><strong>Various types:</strong> Manual planners, digital apps, academic planners, work planners.</li>
+        <li><strong>Key features included:</strong> Time blocking, reminders, sync, automatic updates.</li>
+        <li><strong>Main benefits:</strong> Routine building, focus enhancement, long-term planning, work-life balance.</li>
       </ul>
     </div>
 
     <!-- SECTION 3 -->
     <div class="section" id="section-3">
-      <h2>KEY FOCUS</h2>
+      <h1>Key Focus Areas</h1>
+
       <ul>
-        <li>Online accessibility for task management.</li>
-        <li>Prioritization methods: Eisenhower Matrix, ABC analysis.</li>
-        <li>Multiple views: daily, weekly, monthly.</li>
-        <li>Integration with other productivity tools.</li>
-        <li>User-friendly and customizable interface.</li>
+        <li><strong>Online accessibility</strong> for seamless task management from anywhere.</li>
+        <li><strong>Prioritization methods:</strong> Eisenhower Matrix, ABC analysis, MoSCoW method.</li>
+        <li><strong>Multiple viewing options:</strong> Daily, weekly, monthly, and yearly perspectives.</li>
+        <li><strong>Integration capabilities:</strong> Works with other productivity tools and platforms.</li>
+        <li><strong>User experience:</strong> Intuitive, customizable, and visually appealing interface.</li>
       </ul>
     </div>
 
     <!-- SECTION 4 -->
     <div class="section" id="section-4">
-      <h2>CORE OBJECTIVE</h2>
+      <h1>Core Objectives</h1>
+
       <ul>
-        <li>Measure whether the planner improves student time management.</li>
-        <li>Reduce procrastination and increase productivity.</li>
-        <li>Promote goal-oriented planning and decision-making.</li>
-        <li>Support balance between academic and personal life.</li>
-        <li>Provide visual scheduling and stress reduction tools.</li>
+        <li><strong>Measure effectiveness</strong> of the planner in improving student time management.</li>
+        <li><strong>Combat procrastination</strong> and increase overall productivity levels.</li>
+        <li><strong>Promote goal-oriented planning</strong> and strategic decision-making.</li>
+        <li><strong>Support balance</strong> between academic responsibilities and personal life.</li>
+        <li><strong>Provide tools</strong> for visual scheduling and stress reduction.</li>
       </ul>
     </div>
 
     <!-- Navigation Buttons -->
     <div class="button-container">
-      <button class="nav-button" id="prev-btn" onclick="changeSection(-1)">← Previous</button>
-      <button class="nav-button" id="next-btn" onclick="changeSection(1)">Next →</button>
+      <button class="nav-button" id="prev-btn" onclick="changeSection(-1)">
+        <i class="fas fa-chevron-left"></i> Previous
+      </button>
+      <button class="nav-button" id="next-btn" onclick="changeSection(1)">
+        Next <i class="fas fa-chevron-right"></i>
+      </button>
     </div>
 
+    <div class="slide-indicator">
+      <span id="slideCount">1 / 4</span>
+    </div>
   </div>
 
   <script>
@@ -148,13 +287,11 @@
         document.getElementById(`section-${i}`).classList.remove("active");
       }
       document.getElementById(`section-${index}`).classList.add("active");
-
+      document.getElementById('slideCount').textContent = `${index} / ${totalSections}`;
       updateButtons();
     }
 
     function changeSection(direction) {
-
-      // Last slide → Take user to HOME
       if (currentSection === totalSections && direction === 1) {
         window.location.href = "Homepage(Neuman Group 2).html";
         return;
@@ -170,16 +307,18 @@
 
     function updateButtons() {
       const nextBtn = document.getElementById("next-btn");
+      const prevBtn = document.getElementById("prev-btn");
 
       if (currentSection === totalSections) {
-        nextBtn.textContent = "Home";
+        nextBtn.innerHTML = '<i class="fas fa-home"></i> Home';
       } else {
-        nextBtn.textContent = "Next →";
+        nextBtn.innerHTML = 'Next <i class="fas fa-chevron-right"></i>';
       }
+
+      prevBtn.disabled = currentSection === 1;
     }
 
     updateButtons();
   </script>
-
 </body>
 </html>
