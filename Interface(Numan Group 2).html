@@ -1,1063 +1,1574 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Weekly Schedule Planner</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Weekly Schedule Planner</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-<style>
-/* Global */
-body {
-  font-family: Arial, sans-serif;
-  margin: 0;
-  padding: 0;
-  background-color: #FFFFFF;
-  color: #000000;
-  overflow-x: hidden;
-  scroll-behavior: smooth;
-}
-html, body { height: 100%; }
+    html, body {
+      height: 100%;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
 
-/* Header */
-header {
-  background-color: #FFA500;
-  color: white;
-  padding: 25px;
-  text-align: center;
-  font-size: 22px;
-  position: relative;
-}
-header i { margin-right: 8px; }
+    body {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #333;
+      overflow-x: hidden;
+      min-height: 100vh;
+      position: relative;
+    }
 
-/* Home Button */
-#homeBtn {
-  position: absolute;
-  top: 15px;
-  left: 15px;
-  background-color: #FFB347;
-  color: white;
-  border: none;
-  padding: 10px 15px;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 16px;
-}
-#homeBtn:hover { background-color: #FF8C00; }
+    body::before {
+      content: '';
+      position: absolute;
+      width: 400px;
+      height: 400px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 50%;
+      top: -100px;
+      left: -100px;
+      pointer-events: none;
+      animation: drift 20s ease-in-out infinite;
+    }
 
-/* Layout container */
-.container {
-  display: flex;
-  width: 100%;
-  margin: 20px auto;
-  max-width: 1400px;
-}
+    body::after {
+      content: '';
+      position: absolute;
+      width: 350px;
+      height: 350px;
+      background: rgba(255, 255, 255, 0.06);
+      border-radius: 50%;
+      bottom: -50px;
+      right: -50px;
+      pointer-events: none;
+      animation: drift 25s ease-in-out infinite reverse;
+    }
 
-/* Sidebar */
-.sidebar {
-  width: 250px;
-  background-color: #FFA500;
-  color: white;
-  padding: 25px;
-  border-radius: 10px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-}
-.sidebar h3 { margin-top: 0; font-size: 20px; }
+    @keyframes drift {
+      0%, 100% { transform: translate(0, 0); }
+      50% { transform: translate(30px, 30px); }
+    }
 
-.day-button {
-  background-color: #FFB347;
-  color: white;
-  padding: 12px;
-  margin: 8px 0;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 17px;
-  text-align: left;
-  width: 100%;
-}
-.day-button:hover { background-color: #FF8C00; }
+    /* Header */
+    header {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.08) 100%);
+      backdrop-filter: blur(15px);
+      color: white;
+      padding: 20px 30px;
+      text-align: center;
+      font-size: 22px;
+      position: relative;
+      z-index: 100;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
 
-/* Main content */
-.main-content { flex-grow: 1; margin-left: 15px; }
-.main-content h2 { color: #FF8C00; font-size: 22px; }
+    header i {
+      margin-right: 12px;
+      font-size: 26px;
+    }
 
-/* Form styling */
-.form-group { margin-bottom: 15px; width: auto; }
-label { font-weight: bold; display: block; }
-input[type="time"], input[type="text"], select {
-  width: 100%;
-  padding: 12px;
-  margin-top: 5px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-size: 16px;
-}
+    header h1 {
+      margin: 0;
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
 
-/* Buttons */
-button {
-  background-color: #FFA500;
-  color: white;
-  padding: 12px 20px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  width: 100%;
-  font-size: 17px;
-}
-button:hover { background-color: #FF8C00; }
+    /* Home Button */
+    #homeBtn {
+      position: absolute;
+      top: 15px;
+      left: 15px;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.1) 100%);
+      color: white;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      padding: 10px 18px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
 
-/* Schedule items */
-.schedule-list { margin-top: 20px; }
-.schedule-item {
-  background-color: #fff8f0;
-  padding: 12px;
-  margin-bottom: 10px;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  cursor: pointer;
-}
-.schedule-item small {
-  display: inline-block;
-  margin-top: 6px;
-  color: #666;
-}
+    #homeBtn:hover {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.15) 100%);
+      border-color: rgba(255, 255, 255, 0.5);
+      transform: translateY(-2px);
+    }
 
-/* acknowledged style (minimal visual change) */
-.schedule-item.ack {
-  opacity: 0.7;
-  text-decoration: line-through;
-}
+    /* Main Container */
+    .container {
+      display: flex;
+      width: 100%;
+      gap: 0;
+      min-height: calc(100vh - 70px);
+      position: relative;
+      z-index: 10;
+    }
 
-/* Calendar Section */
-main {
-  flex: 1;
-  padding: 25px;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  margin-top: 40px;
-}
-.calendar {
-  background-color: white;
-  border: 1px solid #ccc;
-  border-radius: 10px;
-  overflow: hidden;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-  font-size: 17px;
-}
-.calendar-header {
-  background-color: #FFA500;
-  color: black;
-  padding: 15px;
-  text-align: center;
-}
-table { width: 100%; border-collapse: collapse; }
-th, td {
-  text-align: center;
-  padding: 12px;
-  border: 1px solid #ddd;
-  vertical-align: top;
-}
-th { background-color: #fff3e0; font-weight: bold; }
-.today { background-color: #ffffcc; font-weight: bold; }
-.empty { background-color: #f9f9f9; }
-.date-cell {
-  cursor: pointer;
-  background-color: #fff8e1;
-  transition: background-color 0.3s;
-  position: relative;
-  min-height: 60px;
-}
-.date-cell:hover { background-color: #FFE4B5; }
+    /* Sidebar */
+    .sidebar {
+      width: 280px;
+      background: rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(15px);
+      color: white;
+      padding: 30px 20px;
+      border-right: 1px solid rgba(255, 255, 255, 0.15);
+      box-shadow: 4px 0 15px rgba(0, 0, 0, 0.1);
+      overflow-y: auto;
+      animation: slideInLeft 0.6s ease-out;
+    }
 
-/* small badge for calendar tasks */
-.calendar-task {
-  font-size: 12px;
-  margin-top: 6px;
-  background: #FFA500;
-  color: white;
-  border-radius: 4px;
-  padding: 2px 6px;
-  display: inline-block;
-  max-width: 100%;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
+    @keyframes slideInLeft {
+      from {
+        transform: translateX(-100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
 
-/* Modal (kept black background per original file) */
-.modal {
-  display: none;
-  position: fixed;
-  z-index: 1000;
-  left: 0; top: 0;
-  width: 100%; height: 100%;
-  background-color: rgba(0,0,0,0.4);
-}
-.modal-content {
-  background-color: black;
-  margin: 6% auto;
-  padding: 20px;
-  border-radius: 10px;
-  width: 420px; /* slightly smaller scale for the calendar modal */
-  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-  color: white;
-}
-/* Small aesthetic calendar inside modal */
-.small-cal {
-  background: linear-gradient(135deg, #ffffff, #ffffff);
-  color: #111827;
-  padding: 12px;
-  border-radius: 10px;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-}
-.small-cal .header {
-  display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;
-}
-.small-cal .header h3 { margin:0; font-size:1rem; color:#374151; }
-.small-cal .days, .small-cal .dates {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap:6px;
-  text-align:center;
-}
-.small-cal .days div { font-size:0.7rem; color:#6b7280; font-weight:600; }
-.small-cal .date {
-  padding:8px;
-  border-radius:8px;
-  cursor:pointer;
-  background:#fff8e1;
-  font-size:0.9rem;
-}
-.small-cal .date.today { outline:2px solid #6366f1; }
-.small-cal .date.selected { background:#eef2ff; font-weight:700; }
-.small-cal textarea {
-  width:100%; height:60px; margin-top:8px; padding:8px; border-radius:8px; border:1px solid #e5e7eb; resize:none;
-}
-.small-cal .small-save {
-  margin-top:8px; width:100%; padding:8px; border-radius:10px; border:none; background:linear-gradient(135deg,#22c55e,#4ade80); color:#fff; font-weight:600;
-}
-.small-cal .small-plans { margin-top:8px; max-height:160px; overflow:auto; color:#374151; }
-.small-cal .small-plan { background:#fff; padding:6px; border-radius:6px; margin-bottom:6px; display:flex; justify-content:space-between; align-items:center; font-size:0.85rem;}
+    .sidebar h3 {
+      margin-top: 0;
+      font-size: 16px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 18px;
+      color: rgba(255, 255, 255, 0.95);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
 
-/* close button */
-.close {
-  color: #aaa;
-  float: right;
-  font-size: 24px;
-  cursor: pointer;
-}
-.close:hover { color: white; }
+    .sidebar h3 i {
+      font-size: 18px;
+    }
 
-/* small helper text */
-.modal .muted { color: #d1d5db; font-size:0.85rem; margin-top:8px; display:block; }
-</style>
+    .day-button {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.08) 100%);
+      color: white;
+      padding: 12px 14px;
+      margin: 8px 0;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 15px;
+      text-align: left;
+      width: 100%;
+      font-weight: 600;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      backdrop-filter: blur(10px);
+    }
+
+    .day-button:hover {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.15) 100%);
+      border-color: rgba(255, 255, 255, 0.4);
+      transform: translateX(5px);
+    }
+
+    .month-selector {
+      margin-top: 30px;
+      padding-top: 25px;
+      border-top: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .month-selector h3 {
+      margin-bottom: 12px;
+    }
+
+    #monthSelect {
+      width: 100%;
+      padding: 10px 12px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 8px;
+      font-size: 14px;
+      background: rgba(255, 255, 255, 0.15);
+      color: white;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+    }
+
+    #monthSelect:hover,
+    #monthSelect:focus {
+      background: rgba(255, 255, 255, 0.25);
+      border-color: rgba(255, 255, 255, 0.5);
+      outline: none;
+    }
+
+    #monthSelect option {
+      background: #667eea;
+      color: white;
+    }
+
+    /* Main Content */
+    .main-content {
+      flex-grow: 1;
+      padding: 30px;
+      display: flex;
+      flex-direction: column;
+      gap: 25px;
+      overflow-y: auto;
+      animation: slideInRight 0.6s ease-out;
+    }
+
+    @keyframes slideInRight {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    .main-content h2 {
+      color: white;
+      font-size: 20px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 0;
+    }
+
+    .main-content h2 i {
+      font-size: 24px;
+    }
+
+    /* Form Section */
+    .form-section {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      padding: 25px;
+      border-radius: 15px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    label {
+      font-weight: 700;
+      display: block;
+      margin-bottom: 8px;
+      color: #333;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    input[type="time"],
+    input[type="text"],
+    select {
+      width: 100%;
+      padding: 12px 14px;
+      margin-top: 6px;
+      border: 2px solid #e0e0e0;
+      border-radius: 10px;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      background: #f8f9fa;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    input[type="time"]:focus,
+    input[type="text"]:focus,
+    select:focus {
+      outline: none;
+      border-color: #667eea;
+      background: white;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    button {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      width: 100%;
+      font-size: 15px;
+      font-weight: 700;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+    }
+
+    button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 30px rgba(102, 126, 234, 0.4);
+    }
+
+    button:active {
+      transform: translateY(-1px);
+    }
+
+    /* Schedule Items */
+    .schedule-list {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      padding: 25px;
+      border-radius: 15px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .schedule-list h3 {
+      margin: 0 0 18px 0;
+      color: #333;
+      font-size: 16px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .schedule-list h3 i {
+      color: #667eea;
+    }
+
+    .schedule-item {
+      background: linear-gradient(135deg, #f8f9fa 0%, #f0f2f8 100%);
+      padding: 14px;
+      margin-bottom: 12px;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border-left: 4px solid #667eea;
+    }
+
+    .schedule-item:hover {
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+      transform: translateX(5px);
+    }
+
+    .schedule-item p {
+      margin: 8px 0;
+      color: #333;
+      font-size: 14px;
+    }
+
+    .schedule-item p strong {
+      color: #667eea;
+      font-weight: 700;
+    }
+
+    .schedule-item small {
+      display: inline-block;
+      margin-top: 8px;
+      color: #999;
+      font-size: 12px;
+    }
+
+    .schedule-item.ack {
+      opacity: 0.6;
+      text-decoration: line-through;
+      border-left-color: #999;
+    }
+
+    .empty-message {
+      color: #999;
+      font-style: italic;
+      text-align: center;
+      padding: 20px;
+    }
+
+    /* Calendar Container */
+    main {
+      flex: 1;
+      padding: 30px;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      position: relative;
+      z-index: 10;
+    }
+
+    .calendar {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+      font-size: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      width: 100%;
+      max-width: 600px;
+    }
+
+    .calendar-header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 20px;
+      text-align: center;
+      font-weight: 700;
+      font-size: 18px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      text-align: center;
+      padding: 12px;
+      border: 1px solid #f0f0f0;
+      vertical-align: top;
+      font-weight: 600;
+      color: #333;
+    }
+
+    th {
+      background: linear-gradient(135deg, #f8f9fa 0%, #f0f2f8 100%);
+      font-weight: 700;
+      color: #667eea;
+      text-transform: uppercase;
+      font-size: 12px;
+      letter-spacing: 0.5px;
+    }
+
+    .today {
+      background: linear-gradient(135deg, #fff8e1 0%, #ffe4b5 100%);
+      font-weight: 700;
+      color: #ff9800;
+    }
+
+    .empty {
+      background: #fafbfc;
+      color: #ccc;
+    }
+
+    .date-cell {
+      cursor: pointer;
+      background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
+      transition: all 0.3s ease;
+      position: relative;
+      min-height: 70px;
+      font-weight: 600;
+    }
+
+    .date-cell:hover {
+      background: linear-gradient(135deg, #f0f2f8 0%, #e8ecf8 100%);
+      box-shadow: inset 0 0 10px rgba(102, 126, 234, 0.1);
+    }
+
+    .calendar-task {
+      font-size: 11px;
+      margin-top: 6px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border-radius: 5px;
+      padding: 3px 6px;
+      display: inline-block;
+      max-width: 100%;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-weight: 600;
+    }
+
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 2000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .modal-content {
+      background: rgba(255, 255, 255, 0.98);
+      backdrop-filter: blur(10px);
+      margin: 5% auto;
+      padding: 30px;
+      border-radius: 20px;
+      width: 95%;
+      max-width: 450px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      animation: slideUp 0.4s ease-out;
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .close {
+      color: #999;
+      float: right;
+      font-size: 28px;
+      cursor: pointer;
+      transition: color 0.3s ease;
+      line-height: 1;
+    }
+
+    .close:hover {
+      color: #667eea;
+    }
+
+    .small-cal {
+      background: white;
+      color: #333;
+      padding: 15px;
+      border-radius: 12px;
+    }
+
+    .small-cal .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .small-cal .header h3 {
+      margin: 0;
+      font-size: 16px;
+      color: #333;
+      font-weight: 700;
+    }
+
+    .small-cal .header button {
+      background: rgba(102, 126, 234, 0.1);
+      color: #667eea;
+      width: auto;
+      padding: 6px 12px;
+      font-size: 14px;
+      border-radius: 8px;
+      border: 1px solid rgba(102, 126, 234, 0.2);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin: 0;
+      box-shadow: none;
+    }
+
+    .small-cal .header button:hover {
+      background: rgba(102, 126, 234, 0.2);
+      transform: none;
+    }
+
+    .small-cal .days,
+    .small-cal .dates {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 6px;
+      text-align: center;
+      margin-bottom: 12px;
+    }
+
+    .small-cal .days div {
+      font-size: 11px;
+      color: #999;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .small-cal .date {
+      padding: 8px;
+      border-radius: 8px;
+      cursor: pointer;
+      background: #f8f9fa;
+      font-size: 13px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+
+    .small-cal .date:hover {
+      background: rgba(102, 126, 234, 0.1);
+    }
+
+    .small-cal .date.today {
+      outline: 2px solid #667eea;
+      background: linear-gradient(135deg, #f0f2f8 0%, #e8ecf8 100%);
+    }
+
+    .small-cal .date.selected {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      font-weight: 700;
+    }
+
+    .event-box {
+      margin-top: 15px;
+    }
+
+    #smallSelectedDate {
+      margin: 0 0 12px 0;
+      color: #333;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    textarea {
+      width: 100%;
+      height: 60px;
+      margin-top: 8px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 2px solid #e0e0e0;
+      resize: none;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-size: 14px;
+      transition: all 0.3s ease;
+    }
+
+    textarea:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .small-save {
+      margin-top: 12px;
+      width: 100%;
+      padding: 10px;
+      border-radius: 10px;
+      border: none;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .small-save:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+    }
+
+    .small-plans {
+      margin-top: 12px;
+      max-height: 180px;
+      overflow: auto;
+      color: #333;
+    }
+
+    .small-plan {
+      background: linear-gradient(135deg, #f8f9fa 0%, #f0f2f8 100%);
+      padding: 10px;
+      border-radius: 8px;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+      border-left: 3px solid #667eea;
+    }
+
+    .small-plan button {
+      width: auto;
+      padding: 5px 10px;
+      margin: 0 2px;
+      font-size: 11px;
+    }
+
+    .muted {
+      color: #999;
+      font-size: 12px;
+      margin-top: 8px;
+      display: block;
+    }
+
+    /* Scrollbar Styling */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: rgba(102, 126, 234, 0.3);
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(102, 126, 234, 0.5);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 1200px) {
+      .container {
+        flex-direction: column;
+      }
+
+      .sidebar {
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+        padding: 20px;
+        display: flex;
+        gap: 20px;
+        overflow-x: auto;
+        overflow-y: visible;
+      }
+
+      .sidebar > div:first-child {
+        flex: 1;
+        display: flex;
+        gap: 12px;
+        overflow-x: auto;
+      }
+
+      .day-button {
+        margin: 0;
+        flex-shrink: 0;
+        min-width: 120px;
+      }
+
+      .month-selector {
+        margin: 0;
+        padding: 0;
+        border: none;
+        flex-shrink: 0;
+        min-width: 150px;
+      }
+
+      .main-content {
+        flex-direction: row;
+      }
+
+      main {
+        padding: 15px;
+        min-width: 50%;
+      }
+
+      .schedule-list {
+        min-width: 50%;
+      }
+    }
+
+    @media (max-width: 768px) {
+      header {
+        padding: 15px 20px;
+      }
+
+      header h1 {
+        font-size: 18px;
+      }
+
+      #homeBtn {
+        padding: 8px 14px;
+        font-size: 12px;
+      }
+
+      .container {
+        min-height: auto;
+      }
+
+      .sidebar {
+        width: 100%;
+        padding: 15px;
+        border: none;
+      }
+
+      .main-content {
+        padding: 15px;
+        flex-direction: column;
+      }
+
+      main {
+        padding: 0;
+      }
+
+      .calendar {
+        margin-bottom: 20px;
+      }
+
+      th, td {
+        padding: 8px;
+        font-size: 12px;
+      }
+
+      .date-cell {
+        min-height: 60px;
+        font-size: 12px;
+      }
+
+      .calendar-task {
+        font-size: 10px;
+      }
+
+      .form-section,
+      .schedule-list {
+        width: 100%;
+      }
+    }
+
+    @media (max-width: 480px) {
+      header h1 {
+        font-size: 16px;
+      }
+
+      .sidebar {
+        padding: 10px;
+      }
+
+      .day-button {
+        padding: 10px 12px;
+        font-size: 13px;
+      }
+
+      .form-group {
+        margin-bottom: 14px;
+      }
+
+      input[type="time"],
+      input[type="text"],
+      select {
+        padding: 10px 12px;
+        font-size: 13px;
+      }
+
+      button {
+        padding: 10px 16px;
+        font-size: 13px;
+      }
+
+      .modal-content {
+        width: 90%;
+        padding: 20px;
+      }
+    }
+  </style>
 </head>
-
 <body>
-<header>
-  <button id="homeBtn" onclick="window.location.href='Homepage(Neuman Group 2).html'">Home</button>
-  <h1><i class="fa-solid fa-calendar-check"></i> Weekly Schedule Planner</h1>
-</header>
+  <header>
+    <button id="homeBtn" onclick="window.location.href='Homepage(Neuman Group 2).html'">
+      <i class="fas fa-home"></i> Home
+    </button>
+    <h1><i class="fas fa-calendar-check"></i> Weekly Schedule Planner</h1>
+  </header>
 
-<div class="container">
-  <!-- Sidebar -->
-  <div class="sidebar">
-    <h3>Select a Day</h3>
-    <button class="day-button" data-day="monday">Monday</button>
-    <button class="day-button" data-day="tuesday">Tuesday</button>
-    <button class="day-button" data-day="wednesday">Wednesday</button>
-    <button class="day-button" data-day="thursday">Thursday</button>
-    <button class="day-button" data-day="friday">Friday</button>
-    <button class="day-button" data-day="saturday">Saturday</button>
-    <button class="day-button" data-day="sunday">Sunday</button>
-    
-    <div class="month-selector">
-      <h3>Select Month</h3>
-      <select id="monthSelect">
-        <option value="0">January</option>
-        <option value="1">February</option>
-        <option value="2">March</option>
-        <option value="3">April</option>
-        <option value="4">May</option>
-        <option value="5">June</option>
-        <option value="6">July</option>
-        <option value="7">August</option>
-        <option value="8">September</option>
-        <option value="9">October</option>
-        <option value="10">November</option>
-        <option value="11">December</option>
-      </select>
-    </div>
-  </div>
+  <div class="container">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div>
+        <h3><i class="fas fa-calendar-days"></i> Select a Day</h3>
+        <div style="display: flex; gap: 12px; overflow-x: auto;">
+          <button class="day-button" data-day="monday">Monday</button>
+          <button class="day-button" data-day="tuesday">Tuesday</button>
+          <button class="day-button" data-day="wednesday">Wednesday</button>
+          <button class="day-button" data-day="thursday">Thursday</button>
+          <button class="day-button" data-day="friday">Friday</button>
+          <button class="day-button" data-day="saturday">Saturday</button>
+          <button class="day-button" data-day="sunday">Sunday</button>
+        </div>
+      </div>
 
-  <!-- Main content -->
-  <div class="main-content">
-    <h2>Add Task for <span id="current-day">Monday</span></h2>
-
-    <form id="schedule-form">
-      <div class="form-group">
-        <label>Start Time</label>
-        <input type="time" id="task-start-time" required>
-      </div>
-      <div class="form-group">
-        <label>End Time</label>
-        <input type="time" id="task-end-time" required>
-      </div>
-      <div class="form-group">
-        <label>Task Description</label>
-        <input type="text" id="task-description" placeholder="What do you need to do?" required>
-      </div>
-      <div class="form-group">
-        <label>Priority</label>
-        <select id="task-priority" required>
-          <option value="high">High</option>
-          <option value="medium">Medium</option>
-          <option value="low">Low</option>
+      <div class="month-selector">
+        <h3><i class="fas fa-calendar-alt"></i> Select Month</h3>
+        <select id="monthSelect">
+          <option value="0">January</option>
+          <option value="1">February</option>
+          <option value="2">March</option>
+          <option value="3">April</option>
+          <option value="4">May</option>
+          <option value="5">June</option>
+          <option value="6">July</option>
+          <option value="7">August</option>
+          <option value="8">September</option>
+          <option value="9">October</option>
+          <option value="10">November</option>
+          <option value="11">December</option>
         </select>
       </div>
-
-      <div class="form-group">
-        <label><input type="checkbox" id="task-oneTime" /> One-time (do not treat as recurring)</label>
-      </div>
-
-      <button type="submit">Add Task</button>
-    </form>
-
-    <div class="schedule-list">
-      <h3>Tasks for <span id="tasks-day">Monday</span></h3>
-      <div id="schedule-container"></div>
-      <small style="display:block;margin-top:6px;color:#666">Click a task to acknowledge it and stop its notifications.</small>
     </div>
-  </div>
-</div>
 
-<!-- Calendar Section (main) -->
-<main>
-  <div class="calendar">
-    <div class="calendar-header">
-      <h2 id="calendarTitle">October 2026</h2>
-    </div>
-    <table id="calendarTable">
-      <thead>
-        <tr>
-          <th>Sun</th><th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-  </div>
-</main>
-
-<!-- Modal: small aesthetic calendar for adding date-specific tasks -->
-<div id="taskModal" class="modal" aria-hidden="true">
-  <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-    <span class="close" title="Close">&times;</span>
-
-    <div class="small-cal" id="smallCal">
-      <div class="header">
-        <button id="smallPrev" aria-label="Previous month">‹</button>
-        <h3 id="smallMonthYear">Month Year</h3>
-        <button id="smallNext" aria-label="Next month">›</button>
-      </div>
-
-      <div class="days">
-        <div>Sun</div><div>Mon</div><div>Tue</div>
-        <div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
-      </div>
-
-      <div class="dates" id="smallDates"></div>
-
-      <div class="event-box">
-        <h4 id="smallSelectedDate">Select a date</h4>
-        <textarea id="smallEventText" placeholder="Add a plan... ✨"></textarea>
-
-        <div style="display:flex;gap:8px;margin-top:8px;">
-          <select id="smallPriority" style="flex:1;padding:8px;border-radius:8px;border:1px solid #e5e7eb;">
-            <option value="medium" selected>Medium</option>
-            <option value="high">High</option>
-            <option value="low">Low</option>
-          </select>
-          <label style="display:flex;align-items:center;color:#374151;background:#fff;padding:6px;border-radius:8px;">
-            <input type="checkbox" id="smallOneTime" style="margin-right:6px;" /> One-time
-          </label>
+    <!-- Main Content -->
+    <div class="main-content">
+      <!-- Form Section -->
+      <div style="flex: 1; display: flex; flex-direction: column; gap: 20px;">
+        <div>
+          <h2><i class="fas fa-plus-circle"></i> Add Task for <span id="current-day">Monday</span></h2>
         </div>
 
-        <button class="small-save" id="smallSave">Add Plan</button>
+        <div class="form-section">
+          <form id="schedule-form">
+            <div class="form-group">
+              <label for="task-start-time"><i class="fas fa-clock"></i> Start Time</label>
+              <input type="time" id="task-start-time" required>
+            </div>
 
-        <div id="smallPlans" class="small-plans"></div>
-        <span class="muted">Click an existing plan to acknowledge (stop notifications) or delete it.</span>
+            <div class="form-group">
+              <label for="task-end-time"><i class="fas fa-clock"></i> End Time</label>
+              <input type="time" id="task-end-time" required>
+            </div>
+
+            <div class="form-group">
+              <label for="task-description"><i class="fas fa-edit"></i> Task Description</label>
+              <input type="text" id="task-description" placeholder="What do you need to do?" required>
+            </div>
+
+            <div class="form-group">
+              <label for="task-priority"><i class="fas fa-flag"></i> Priority</label>
+              <select id="task-priority" required>
+                <option value="high">High</option>
+                <option value="medium">Medium</option>
+                <option value="low">Low</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>
+                <input type="checkbox" id="task-oneTime" style="margin-right: 8px; cursor: pointer;">
+                <i class="fas fa-calendar-times"></i> One-time (do not treat as recurring)
+              </label>
+            </div>
+
+            <button type="submit"><i class="fas fa-check"></i> Add Task</button>
+          </form>
+        </div>
+
+        <!-- Schedule List -->
+        <div class="schedule-list">
+          <h3><i class="fas fa-list-check"></i> Tasks for <span id="tasks-day">Monday</span></h3>
+          <div id="schedule-container"></div>
+          <small style="display:block; margin-top: 12px; color: #999; text-align: center;"><i class="fas fa-info-circle"></i> Click a task to acknowledge it</small>
+        </div>
+      </div>
+
+      <!-- Calendar Section -->
+      <div style="flex: 1;">
+        <h2 style="margin-bottom: 15px;"><i class="fas fa-calendar"></i> Calendar View</h2>
+        <main>
+          <div class="calendar">
+            <div class="calendar-header">
+              <h2 id="calendarTitle" style="margin: 0; font-size: 18px;">October 2026</h2>
+            </div>
+            <table id="calendarTable">
+              <thead>
+                <tr>
+                  <th>Sun</th><th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </main>
       </div>
     </div>
   </div>
-</div>
 
-<script>
-// ------------ STORAGE KEYS & UTILS ------------
-const WEEKLY_KEY = 'weeklyTasks_v1';
-const CAL_KEY = 'calendarTasks_v1';
-const LOGGED_USER_KEY = 'loggedInUser_v1'; // must match Login page
+  <!-- Modal -->
+  <div id="taskModal" class="modal" aria-hidden="true">
+    <div class="modal-content" role="dialog" aria-modal="true">
+      <span class="close" title="Close">&times;</span>
 
-function capitalize(str) { return str ? str.charAt(0).toUpperCase() + str.slice(1) : ''; }
-function escapeHtml(s = '') { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
-function isoDateFromParts(y, m, d) { return new Date(y, m, d).toISOString().split('T')[0]; }
+      <div class="small-cal" id="smallCal">
+        <div class="header">
+          <button id="smallPrev" aria-label="Previous month">‹</button>
+          <h3 id="smallMonthYear">Month Year</h3>
+          <button id="smallNext" aria-label="Next month">›</button>
+        </div>
 
-// ------------- PERSISTENCE -------------
-function loadWeeklyTasks() {
-  try {
-    const raw = localStorage.getItem(WEEKLY_KEY);
-    if (!raw) {
-      return { monday: [], tuesday: [], wednesday: [], thursday: [], friday: [], saturday: [], sunday: [] };
+        <div class="days">
+          <div>Sun</div><div>Mon</div><div>Tue</div>
+          <div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+        </div>
+
+        <div class="dates" id="smallDates"></div>
+
+        <div class="event-box">
+          <h4 id="smallSelectedDate">Select a date</h4>
+          <textarea id="smallEventText" placeholder="Add a plan... ✨"></textarea>
+
+          <div style="display:flex; gap: 10px; margin-top: 10px;">
+            <select id="smallPriority" style="flex:1; padding:10px; border-radius:8px; border:2px solid #e0e0e0; background: #f8f9fa; font-weight: 600;">
+              <option value="medium" selected>Medium</option>
+              <option value="high">High</option>
+              <option value="low">Low</option>
+            </select>
+            <label style="display:flex; align-items:center; color:#333; background:#f8f9fa; padding:10px 12px; border-radius:8px; border:2px solid #e0e0e0; cursor:pointer; font-weight:600;">
+              <input type="checkbox" id="smallOneTime" style="margin-right:8px; cursor: pointer;" /> One-time
+            </label>
+          </div>
+
+          <button class="small-save" id="smallSave"><i class="fas fa-save"></i> Add Plan</button>
+
+          <div id="smallPlans" class="small-plans"></div>
+          <span class="muted"><i class="fas fa-lightbulb"></i> Click a plan to acknowledge or delete it</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const WEEKLY_KEY = 'weeklyTasks_v1';
+    const CAL_KEY = 'calendarTasks_v1';
+    const LOGGED_USER_KEY = 'loggedInUser_v1';
+
+    function capitalize(str) { return str ? str.charAt(0).toUpperCase() + str.slice(1) : ''; }
+    function escapeHtml(s = '') { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+    function isoDateFromParts(y, m, d) { return new Date(y, m, d).toISOString().split('T')[0]; }
+
+    function loadWeeklyTasks() {
+      try {
+        const raw = localStorage.getItem(WEEKLY_KEY);
+        if (!raw) return { monday: [], tuesday: [], wednesday: [], thursday: [], friday: [], saturday: [], sunday: [] };
+        const parsed = JSON.parse(raw);
+        const base = { monday: [], tuesday: [], wednesday: [], thursday: [], friday: [], saturday: [], sunday: [] };
+        return Object.assign(base, parsed);
+      } catch (e) {
+        console.error('Failed to load weekly tasks', e);
+        return { monday: [], tuesday: [], wednesday: [], thursday: [], friday: [], saturday: [], sunday: [] };
+      }
     }
-    const parsed = JSON.parse(raw);
-    const base = { monday: [], tuesday: [], wednesday: [], thursday: [], friday: [], saturday: [], sunday: [] };
-    return Object.assign(base, parsed);
-  } catch (e) {
-    console.error('Failed to load weekly tasks', e);
-    return { monday: [], tuesday: [], wednesday: [], thursday: [], friday: [], saturday: [], sunday: [] };
-  }
-}
-function saveWeeklyTasks(obj) {
-  try {
-    localStorage.setItem(WEEKLY_KEY, JSON.stringify(obj));
-  } catch (e) {
-    console.error('Failed to save weekly tasks', e);
-  }
-}
 
-function loadCalendarTasks() {
-  try {
-    const raw = localStorage.getItem(CAL_KEY);
-    return raw ? JSON.parse(raw) : {};
-  } catch (e) {
-    console.error('Failed to load calendar tasks', e);
-    return {};
-  }
-}
-function saveCalendarTasks(obj) {
-  try {
-    localStorage.setItem(CAL_KEY, JSON.stringify(obj));
-  } catch (e) {
-    console.error('Failed to save calendar tasks', e);
-  }
-}
+    function saveWeeklyTasks(obj) {
+      try { localStorage.setItem(WEEKLY_KEY, JSON.stringify(obj)); }
+      catch (e) { console.error('Failed to save weekly tasks', e); }
+    }
 
-// ------------- STATE -------------
-let days = loadWeeklyTasks();
-let calendarTasks = loadCalendarTasks();
+    function loadCalendarTasks() {
+      try {
+        const raw = localStorage.getItem(CAL_KEY);
+        return raw ? JSON.parse(raw) : {};
+      } catch (e) {
+        console.error('Failed to load calendar tasks', e);
+        return {};
+      }
+    }
 
-// UI references
-const scheduleContainer = document.getElementById("schedule-container");
-const currentDayText = document.getElementById("current-day");
-const tasksDayText = document.getElementById("tasks-day");
+    function saveCalendarTasks(obj) {
+      try { localStorage.setItem(CAL_KEY, JSON.stringify(obj)); }
+      catch (e) { console.error('Failed to save calendar tasks', e); }
+    }
 
-// wire day button clicks
-document.querySelectorAll(".day-button").forEach(btn => {
-  btn.addEventListener("click", () => {
-    const day = btn.dataset.day;
-    currentDayText.textContent = capitalize(day);
-    tasksDayText.textContent = capitalize(day);
-    updateTaskList(day);
-    document.querySelectorAll('.day-button').forEach(b => b.style.boxShadow = '');
-    btn.style.boxShadow = '0 2px 8px rgba(0,0,0,0.15)';
-  });
-});
+    let days = loadWeeklyTasks();
+    let calendarTasks = loadCalendarTasks();
 
-// render weekly tasks and attach click-to-acknowledge behavior
-function updateTaskList(day) {
-  scheduleContainer.innerHTML = "";
-  const list = days[day] || [];
-  if (list.length === 0) {
-    scheduleContainer.innerHTML = `<div class="schedule-item"><em>No tasks for ${capitalize(day)} yet.</em></div>`;
-    return;
-  }
-  list.forEach((task, idx) => {
-    const ackClass = task.acknowledged ? 'ack' : '';
-    scheduleContainer.innerHTML += `
-      <div class="schedule-item ${ackClass}" data-day="${day}" data-idx="${idx}" title="Click to acknowledge this task">
-        <p><strong>${escapeHtml(task.start)} - ${escapeHtml(task.end)}</strong></p>
-        <p>${escapeHtml(task.description)}</p>
-        <p>Priority: ${capitalize(task.priority)} ${task.oneTime ? '(one-time)' : '(recurring)'}</p>
-        <small>${task.acknowledged ? 'Acknowledged (notifications stopped)' : 'Click to acknowledge and stop notifications'}</small>
-      </div>`;
-  });
+    const scheduleContainer = document.getElementById("schedule-container");
+    const currentDayText = document.getElementById("current-day");
+    const tasksDayText = document.getElementById("tasks-day");
 
-  // attach click handlers AFTER rendering
-  scheduleContainer.querySelectorAll('.schedule-item').forEach(el => {
-    el.addEventListener('click', () => {
-      const day = el.dataset.day;
-      const idx = Number(el.dataset.idx);
-      if (!days[day] || !days[day][idx]) return;
-      // toggle acknowledgment
-      days[day][idx].acknowledged = true;
-      days[day][idx].lastAcknowledgedAt = new Date().toISOString();
+    document.querySelectorAll(".day-button").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const day = btn.dataset.day;
+        currentDayText.textContent = capitalize(day);
+        tasksDayText.textContent = capitalize(day);
+        updateTaskList(day);
+        document.querySelectorAll('.day-button').forEach(b => b.style.boxShadow = '');
+        btn.style.boxShadow = '0 4px 12px rgba(102, 126, 234, 0.3)';
+      });
+    });
+
+    function updateTaskList(day) {
+      scheduleContainer.innerHTML = "";
+      const list = days[day] || [];
+      if (list.length === 0) {
+        scheduleContainer.innerHTML = `<div class="empty-message"><i class="fas fa-inbox"></i> No tasks for ${capitalize(day)} yet.</div>`;
+        return;
+      }
+      list.forEach((task, idx) => {
+        const ackClass = task.acknowledged ? 'ack' : '';
+        scheduleContainer.innerHTML += `
+          <div class="schedule-item ${ackClass}" data-day="${day}" data-idx="${idx}" title="Click to acknowledge this task">
+            <p><strong><i class="fas fa-clock"></i> ${escapeHtml(task.start)} - ${escapeHtml(task.end)}</strong></p>
+            <p>${escapeHtml(task.description)}</p>
+            <p>Priority: <strong>${capitalize(task.priority)}</strong> ${task.oneTime ? '<span style="color:#999;">(one-time)</span>' : '<span style="color:#999;">(recurring)</span>'}</p>
+            <small>${task.acknowledged ? '✓ Acknowledged' : 'Click to acknowledge'}</small>
+          </div>`;
+      });
+
+      scheduleContainer.querySelectorAll('.schedule-item').forEach(el => {
+        el.addEventListener('click', () => {
+          const day = el.dataset.day;
+          const idx = Number(el.dataset.idx);
+          if (!days[day] || !days[day][idx]) return;
+          days[day][idx].acknowledged = true;
+          days[day][idx].lastAcknowledgedAt = new Date().toISOString();
+          saveWeeklyTasks(days);
+          updateTaskList(day);
+        });
+      });
+    }
+
+    document.getElementById("schedule-form").addEventListener("submit", e => {
+      e.preventDefault();
+      const startTime = document.getElementById("task-start-time").value;
+      const endTime = document.getElementById("task-end-time").value;
+      const description = document.getElementById("task-description").value;
+      const priority = document.getElementById("task-priority").value;
+      const oneTime = document.getElementById("task-oneTime").checked;
+      const day = currentDayText.textContent.toLowerCase();
+
+      if (!startTime || !endTime || !description) return;
+
+      const taskObj = {
+        start: startTime,
+        end: endTime,
+        description: description,
+        priority: priority,
+        oneTime: !!oneTime,
+        createdAt: new Date().toISOString(),
+        acknowledged: false,
+        lastNotified: null
+      };
+
+      days[day].push(taskObj);
       saveWeeklyTasks(days);
       updateTaskList(day);
+      e.target.reset();
     });
-  });
-}
 
-// form to add weekly tasks (now supports one-time checkbox)
-document.getElementById("schedule-form").addEventListener("submit", e => {
-  e.preventDefault();
-  const startTime = document.getElementById("task-start-time").value;
-  const endTime = document.getElementById("task-end-time").value;
-  const description = document.getElementById("task-description").value;
-  const priority = document.getElementById("task-priority").value;
-  const oneTime = document.getElementById("task-oneTime").checked;
-  const day = currentDayText.textContent.toLowerCase();
+    const monthSelect = document.getElementById("monthSelect");
+    const calendarTitle = document.getElementById("calendarTitle");
+    const calendarTable = document.getElementById("calendarTable");
+    let currentYear = new Date().getFullYear();
+    const todayISO = new Date().toISOString().split('T')[0];
 
-  if (!startTime || !endTime || !description) return;
+    monthSelect.value = String(new Date().getMonth());
 
-  const taskObj = {
-    start: startTime,
-    end: endTime,
-    description: description,
-    priority: priority,
-    oneTime: !!oneTime,
-    createdAt: new Date().toISOString(),
-    acknowledged: false,
-    lastNotified: null
-  };
+    function buildCalendar(month) {
+      const year = currentYear;
+      const monthName = monthSelect.options[month].text;
+      calendarTitle.textContent = `${monthName} ${year}`;
 
-  days[day].push(taskObj);
-  saveWeeklyTasks(days);
-  updateTaskList(day);
-  e.target.reset();
-});
+      const firstDay = new Date(year, month, 1).getDay();
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+      const tbody = calendarTable.querySelector("tbody");
+      tbody.innerHTML = '';
+      let date = 1;
 
-// ------------- MAIN CALENDAR (page) -------------
-const monthSelect = document.getElementById("monthSelect");
-const calendarTitle = document.getElementById("calendarTitle");
-const calendarTable = document.getElementById("calendarTable");
-let currentYear = (new Date()).getFullYear();
-const todayISO = new Date().toISOString().split('T')[0];
+      for (let i = 0; i < 6; i++) {
+        const row = document.createElement("tr");
+        for (let j = 0; j < 7; j++) {
+          const cell = document.createElement("td");
+          if ((i === 0 && j < firstDay) || date > daysInMonth) {
+            cell.classList.add("empty");
+          } else {
+            const dateISO = isoDateFromParts(year, month, date);
+            cell.classList.add("date-cell");
 
-monthSelect.value = String(new Date().getMonth());
+            const numberDiv = document.createElement('div');
+            numberDiv.textContent = date;
+            cell.appendChild(numberDiv);
 
-function buildCalendar(month) {
-  const year = currentYear;
-  const monthName = monthSelect.options[month].text;
-  calendarTitle.textContent = `${monthName} ${year}`;
+            cell.dataset.date = dateISO;
 
-  const firstDay = new Date(year, month, 1).getDay();
-  const daysInMonth = new Date(year, month+1, 0).getDate();
-  const tbody = calendarTable.querySelector("tbody");
-  tbody.innerHTML = '';
-  let date = 1;
+            if (dateISO === todayISO) cell.classList.add('today');
 
-  for(let i=0;i<6;i++){
-    const row = document.createElement("tr");
-    for(let j=0;j<7;j++){
-      const cell = document.createElement("td");
-      if((i===0 && j<firstDay) || date>daysInMonth){
-        cell.classList.add("empty");
-      } else {
-        const dateISO = isoDateFromParts(year, month, date);
-        cell.classList.add("date-cell");
+            const tasks = calendarTasks[dateISO] || [];
+            tasks.slice(0, 2).forEach(t => {
+              const badge = document.createElement('div');
+              badge.className = 'calendar-task';
+              badge.textContent = (t.title || t);
+              cell.appendChild(badge);
+            });
 
-        const numberDiv = document.createElement('div');
-        numberDiv.textContent = date;
-        numberDiv.style.fontWeight = '600';
-        numberDiv.style.marginBottom = '6px';
-        cell.appendChild(numberDiv);
+            if (tasks.length > 2) {
+              const more = document.createElement('div');
+              more.className = 'calendar-task';
+              more.textContent = `+${tasks.length - 2}`;
+              cell.appendChild(more);
+            }
 
-        cell.dataset.date = dateISO;
-
-        if (dateISO === todayISO) {
-          cell.classList.add('today');
+            date++;
+          }
+          row.appendChild(cell);
         }
+        tbody.appendChild(row);
+      }
+    }
 
-        const tasks = calendarTasks[dateISO] || [];
-        tasks.slice(0, 2).forEach((t) => {
+    monthSelect.addEventListener("change", e => buildCalendar(parseInt(e.target.value, 10)));
+
+    calendarTable.addEventListener("click", e => {
+      const td = e.target.closest('td');
+      if (!td || !td.classList.contains('date-cell')) return;
+      const clickedISO = td.dataset.date;
+      openSmallCalendarModalWithDate(clickedISO);
+    });
+
+    const modal = document.getElementById("taskModal");
+    const closeBtn = document.getElementsByClassName("close")[0];
+    const smallDates = document.getElementById("smallDates");
+    const smallMonthYear = document.getElementById("smallMonthYear");
+    const smallSelectedDate = document.getElementById("smallSelectedDate");
+    const smallEventText = document.getElementById("smallEventText");
+    const smallPlans = document.getElementById("smallPlans");
+    const smallSave = document.getElementById("smallSave");
+    const smallPrev = document.getElementById("smallPrev");
+    const smallNext = document.getElementById("smallNext");
+    const smallPriority = document.getElementById("smallPriority");
+    const smallOneTime = document.getElementById("smallOneTime");
+
+    let smallCurrent = new Date();
+    let smallSelected = null;
+
+    function formatMonthYear(date) { return date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' }); }
+    function smallGetISO(y, m, d) { return isoDateFromParts(y, m, d); }
+
+    function renderSmallCalendar() {
+      smallDates.innerHTML = '';
+      const year = smallCurrent.getFullYear();
+      const month = smallCurrent.getMonth();
+      smallMonthYear.textContent = formatMonthYear(smallCurrent);
+
+      const firstDay = new Date(year, month, 1).getDay();
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+      for (let i = 0; i < firstDay; i++) {
+        const empty = document.createElement('div');
+        smallDates.appendChild(empty);
+      }
+
+      for (let day = 1; day <= daysInMonth; day++) {
+        const dateKey = smallGetISO(year, month, day);
+        const d = document.createElement('div');
+        d.className = 'date';
+        d.textContent = day;
+        d.dataset.date = dateKey;
+        if (dateKey === todayISO) d.classList.add('today');
+        if (dateKey === smallSelected) d.classList.add('selected');
+
+        const tasks = calendarTasks[dateKey] || [];
+        if (tasks.length) {
           const badge = document.createElement('div');
           badge.className = 'calendar-task';
-          badge.textContent = (t.title || t);
-          cell.appendChild(badge);
-        });
-
-        if (tasks.length > 2) {
-          const more = document.createElement('div');
-          more.className = 'calendar-task';
-          more.textContent = `+${tasks.length - 2} more`;
-          cell.appendChild(more);
+          badge.textContent = tasks[0].title || '(plan)';
+          badge.style.marginTop = '6px';
+          d.appendChild(badge);
         }
 
-        date++;
+        d.addEventListener('click', () => {
+          smallSelected = d.dataset.date;
+          smallSelectedDate.textContent = '📅 Plans for ' + smallSelected;
+          renderSmallCalendar();
+          renderSmallPlans();
+        });
+
+        smallDates.appendChild(d);
       }
-      row.appendChild(cell);
-    }
-    tbody.appendChild(row);
-  }
-}
-
-monthSelect.addEventListener("change", e => buildCalendar(parseInt(e.target.value, 10)));
-
-// clicking a calendar cell opens the small modal (same modal) and focuses the small calendar to that date
-calendarTable.addEventListener("click", e => {
-  const td = e.target.closest('td');
-  if (!td || !td.classList.contains('date-cell')) return;
-  // set the small modal's month to the clicked month
-  const clickedISO = td.dataset.date;
-  openSmallCalendarModalWithDate(clickedISO);
-});
-
-// ------------- SMALL CALENDAR (modal) -------------
-const modal = document.getElementById("taskModal");
-const closeBtn = document.getElementsByClassName("close")[0];
-const smallDates = document.getElementById("smallDates");
-const smallMonthYear = document.getElementById("smallMonthYear");
-const smallSelectedDate = document.getElementById("smallSelectedDate");
-const smallEventText = document.getElementById("smallEventText");
-const smallPlans = document.getElementById("smallPlans");
-const smallSave = document.getElementById("smallSave");
-const smallPrev = document.getElementById("smallPrev");
-const smallNext = document.getElementById("smallNext");
-const smallPriority = document.getElementById("smallPriority");
-const smallOneTime = document.getElementById("smallOneTime");
-
-let smallCurrent = new Date();
-let smallSelected = null;
-
-function formatMonthYear(date) {
-  return date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-}
-
-function smallGetISO(y, m, d) { return isoDateFromParts(y,m,d); }
-
-function renderSmallCalendar() {
-  smallDates.innerHTML = '';
-  const year = smallCurrent.getFullYear();
-  const month = smallCurrent.getMonth();
-  smallMonthYear.textContent = formatMonthYear(smallCurrent);
-
-  const firstDay = new Date(year, month, 1).getDay();
-  const daysInMonth = new Date(year, month+1, 0).getDate();
-
-  // blank slots
-  for (let i = 0; i < firstDay; i++) {
-    const empty = document.createElement('div');
-    smallDates.appendChild(empty);
-  }
-
-  for (let day = 1; day <= daysInMonth; day++) {
-    const dateKey = smallGetISO(year, month, day);
-    const d = document.createElement('div');
-    d.className = 'date';
-    d.textContent = day;
-    d.dataset.date = dateKey;
-    if (dateKey === todayISO) d.classList.add('today');
-    if (dateKey === smallSelected) d.classList.add('selected');
-
-    // show small badge if events present
-    const tasks = calendarTasks[dateKey] || [];
-    if (tasks.length) {
-      const badge = document.createElement('div');
-      badge.className = 'calendar-task';
-      badge.textContent = tasks[0].title || '(plan)';
-      badge.style.marginTop = '6px';
-      d.appendChild(badge);
     }
 
-    d.addEventListener('click', () => {
-      smallSelected = d.dataset.date;
-      smallSelectedDate.textContent = 'Plans for ' + smallSelected;
+    function renderSmallPlans() {
+      smallPlans.innerHTML = '';
+      if (!smallSelected) return;
+      const plans = calendarTasks[smallSelected] || [];
+      if (!plans.length) {
+        smallPlans.innerHTML = `<div class="small-plan" style="border-left-color: #ddd;"><em>No plans for ${smallSelected}</em></div>`;
+        return;
+      }
+      plans.forEach((p, idx) => {
+        const div = document.createElement('div');
+        div.className = 'small-plan';
+        const left = document.createElement('div');
+        left.innerHTML = `<strong>${escapeHtml(p.title)}</strong><div style="font-size:0.85rem;color:#999">${escapeHtml(p.description || '')}</div><small style="color:#999">Priority: ${capitalize(p.priority)}</small>`;
+        const right = document.createElement('div');
+
+        const ackBtn = document.createElement('button');
+        ackBtn.textContent = 'Ack';
+        ackBtn.style.marginRight = '4px';
+        ackBtn.onclick = (ev) => {
+          ev.stopPropagation();
+          calendarTasks[smallSelected][idx].acknowledged = true;
+          saveCalendarTasks(calendarTasks);
+          renderSmallPlans();
+          buildCalendar(parseInt(monthSelect.value, 10));
+        };
+
+        const delBtn = document.createElement('button');
+        delBtn.textContent = 'Delete';
+        delBtn.style.background = '#e74c3c';
+        delBtn.onclick = (ev) => {
+          ev.stopPropagation();
+          if (!confirm('Delete this plan?')) return;
+          calendarTasks[smallSelected].splice(idx, 1);
+          if (!calendarTasks[smallSelected].length) delete calendarTasks[smallSelected];
+          saveCalendarTasks(calendarTasks);
+          renderSmallPlans();
+          buildCalendar(parseInt(monthSelect.value, 10));
+        };
+
+        right.appendChild(ackBtn);
+        right.appendChild(delBtn);
+        div.appendChild(left);
+        div.appendChild(right);
+        smallPlans.appendChild(div);
+      });
+    }
+
+    smallPrev.addEventListener('click', () => {
+      smallCurrent.setMonth(smallCurrent.getMonth() - 1);
+      renderSmallCalendar();
+    });
+
+    smallNext.addEventListener('click', () => {
+      smallCurrent.setMonth(smallCurrent.getMonth() + 1);
+      renderSmallCalendar();
+    });
+
+    function openSmallCalendarModalWithDate(iso) {
+      modal.style.display = 'block';
+      modal.setAttribute('aria-hidden', 'false');
+
+      if (iso) {
+        const parts = iso.split('-').map(Number);
+        const dateObj = new Date(parts[0], parts[1] - 1, parts[2]);
+        smallCurrent = new Date(dateObj.getFullYear(), dateObj.getMonth(), 1);
+        smallSelected = iso;
+      } else {
+        smallCurrent = new Date();
+        smallSelected = new Date().toISOString().split('T')[0];
+      }
+
+      smallEventText.value = '';
+      smallPriority.value = 'medium';
+      smallOneTime.checked = false;
       renderSmallCalendar();
       renderSmallPlans();
-    });
-
-    smallDates.appendChild(d);
-  }
-}
-
-function renderSmallPlans() {
-  smallPlans.innerHTML = '';
-  if (!smallSelected) return;
-  const plans = calendarTasks[smallSelected] || [];
-  if (!plans.length) {
-    smallPlans.innerHTML = `<div class="small-plan">No plans for ${smallSelected}</div>`;
-    return;
-  }
-  plans.forEach((p, idx) => {
-    const div = document.createElement('div');
-    div.className = 'small-plan';
-    const left = document.createElement('div');
-    left.innerHTML = `<strong>${escapeHtml(p.title)}</strong><div style="font-size:0.85rem;color:#6b7280">${escapeHtml(p.description || '')}</div><small style="color:#6b7280">Priority: ${capitalize(p.priority || 'medium')} ${p.oneTime ? '(one-time)' : '(recurring)'}</small>`;
-    const right = document.createElement('div');
-
-    const ackBtn = document.createElement('button');
-    ackBtn.textContent = 'Acknowledge';
-    ackBtn.style.marginRight = '6px';
-    ackBtn.onclick = (ev) => {
-      ev.stopPropagation();
-      calendarTasks[smallSelected][idx].acknowledged = true;
-      saveCalendarTasks(calendarTasks);
-      renderSmallPlans();
-      buildCalendar(parseInt(monthSelect.value, 10));
-    };
-
-    const delBtn = document.createElement('button');
-    delBtn.textContent = 'Delete';
-    delBtn.style.background = '#ef4444';
-    delBtn.onclick = (ev) => {
-      ev.stopPropagation();
-      if (!confirm('Delete this plan?')) return;
-      calendarTasks[smallSelected].splice(idx,1);
-      if (!calendarTasks[smallSelected].length) delete calendarTasks[smallSelected];
-      saveCalendarTasks(calendarTasks);
-      renderSmallPlans();
-      buildCalendar(parseInt(monthSelect.value, 10));
-    };
-
-    right.appendChild(ackBtn);
-    right.appendChild(delBtn);
-    div.appendChild(left);
-    div.appendChild(right);
-    smallPlans.appendChild(div);
-  });
-}
-
-// small calendar nav
-smallPrev.addEventListener('click', () => {
-  smallCurrent.setMonth(smallCurrent.getMonth() - 1);
-  renderSmallCalendar();
-});
-smallNext.addEventListener('click', () => {
-  smallCurrent.setMonth(smallCurrent.getMonth() + 1);
-  renderSmallCalendar();
-});
-
-// open modal focused on a specific ISO date (if provided) or current
-function openSmallCalendarModalWithDate(iso) {
-  modal.style.display = 'block';
-  modal.setAttribute('aria-hidden','false');
-
-  if (iso) {
-    const parts = iso.split('-').map(Number);
-    const dateObj = new Date(parts[0], parts[1]-1, parts[2]);
-    smallCurrent = new Date(dateObj.getFullYear(), dateObj.getMonth(), 1);
-    smallSelected = iso;
-  } else {
-    smallCurrent = new Date();
-    smallSelected = new Date().toISOString().split('T')[0];
-  }
-  smallEventText.value = '';
-  smallPriority.value = 'medium';
-  smallOneTime.checked = false;
-  renderSmallCalendar();
-  renderSmallPlans();
-  document.getElementById('taskTitle')?.focus();
-}
-
-// modal close handlers
-closeBtn.onclick = () => { modal.style.display='none'; modal.setAttribute('aria-hidden','true'); };
-window.addEventListener('click', e => { if (e.target === modal) { modal.style.display='none'; modal.setAttribute('aria-hidden','true'); } });
-
-// saving plan inside modal
-smallSave.addEventListener('click', () => {
-  if (!smallSelected) return alert('Please select a date first.');
-  const title = smallEventText.value.trim();
-  const desc = ''; // small modal uses only event text; we can put it into title/description
-  const priority = smallPriority.value || 'medium';
-  const oneTime = !!smallOneTime.checked;
-  if (!title) return alert('Enter a title for the plan.');
-
-  if (!calendarTasks[smallSelected]) calendarTasks[smallSelected] = [];
-  calendarTasks[smallSelected].push({ title, description: desc, priority, oneTime, createdAt: new Date().toISOString(), acknowledged: false, lastNotified: null });
-  saveCalendarTasks(calendarTasks);
-  smallEventText.value = '';
-  renderSmallPlans();
-  renderSmallCalendar();
-  buildCalendar(parseInt(monthSelect.value, 10));
-});
-
-// ------------- DAILY CLEANUP (oneTime weekly tasks removed after retention, calendar tasks older than cutoff) -------------
-const retentionDays = 30; // change if needed
-
-function dailyCleanup() {
-  try {
-    const cutoff = Date.now() - retentionDays * 24 * 60 * 60 * 1000;
-    // cleanup calendar tasks older than cutoff (based on createdAt)
-    Object.keys(calendarTasks).forEach(dateISO => {
-      const arr = calendarTasks[dateISO];
-      const kept = arr.filter(t => {
-        if (!t.createdAt) return true; // keep if no timestamp
-        return new Date(t.createdAt).getTime() >= cutoff;
-      });
-      if (kept.length) {
-        calendarTasks[dateISO] = kept;
-      } else {
-        delete calendarTasks[dateISO];
-      }
-    });
-    saveCalendarTasks(calendarTasks);
-
-    // cleanup weekly tasks only if they are oneTime and older than cutoff
-    Object.keys(days).forEach(day => {
-      days[day] = (days[day] || []).filter(t => {
-        if (!t.oneTime) return true; // keep recurring tasks
-        if (!t.createdAt) return true;
-        return new Date(t.createdAt).getTime() >= cutoff;
-      });
-    });
-    saveWeeklyTasks(days);
-
-    // rebuild UI
-    buildCalendar(parseInt(monthSelect.value, 10));
-    updateTaskList(currentDayText.textContent.toLowerCase());
-  } catch (e) {
-    console.error('Daily cleanup failed', e);
-  }
-}
-
-function scheduleDailyCleanup() {
-  // run once now
-  dailyCleanup();
-  // compute ms until next midnight
-  const now = new Date();
-  const nextMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
-  const msUntil = nextMidnight - now;
-  setTimeout(() => {
-    dailyCleanup();
-    // after first run, run every 24h
-    setInterval(dailyCleanup, 24 * 60 * 60 * 1000);
-  }, msUntil);
-}
-
-// ------------- NOTIFICATIONS (in-page) ✅ FIXED VERSION -----------
-let notifIntervals = [];
-let loggedInUser = localStorage.getItem(LOGGED_USER_KEY) || null;
-
-function onUserLogin(username) {
-  loggedInUser = username;
-  localStorage.setItem(LOGGED_USER_KEY, username);
-  console.log('✅ User logged in:', loggedInUser);
-  startNotificationService();
-}
-
-function onUserLogout() {
-  loggedInUser = null;
-  localStorage.removeItem(LOGGED_USER_KEY);
-  console.log('⏸️ User logged out');
-  stopNotificationService();
-}
-
-async function requestNotificationPermission() {
-  if (!('Notification' in window)) {
-    console.warn('⚠️ Notifications not supported in this browser');
-    return false;
-  }
-  if (Notification.permission === 'granted') {
-    console.log('✅ Notification permission already granted');
-    return true;
-  }
-  if (Notification.permission === 'denied') {
-    console.warn('⚠️ Notification permission denied by user');
-    return false;
-  }
-  const result = await Notification.requestPermission();
-  console.log('📋 Notification permission request result:', result);
-  return result === 'granted';
-}
-
-function notifyUser(title, body) {
-  if (Notification.permission !== 'granted') {
-    console.warn('⚠️ Notification permission not granted, cannot send notification');
-    return;
-  }
-  try {
-    console.log('🔔 Sending notification:', title, body);
-    new Notification(title, { 
-      body,
-      icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y="75" font-size="75">📅</text></svg>',
-      tag: 'schedule-planner-notification'
-    });
-  } catch (e) {
-    console.error('❌ Notification failed', e);
-  }
-}
-
-function markWeeklyTaskNotified(day, index) {
-  const list = days[day];
-  if (!list || !list[index]) return;
-  list[index].lastNotified = new Date().toISOString();
-  saveWeeklyTasks(days);
-}
-
-function shouldNotifyTaskWeekly(task, minGapMinutes = 2) {
-  if (!task) return false;
-  if (task.acknowledged) return false;
-  if (!task.lastNotified) return true;
-  const last = new Date(task.lastNotified);
-  const diffMin = (Date.now() - last.getTime()) / 60000;
-  return diffMin >= minGapMinutes;
-}
-
-function checkWeeklyTasksForPriority(priority, notifyGapMinutes) {
-  if (!loggedInUser) return;
-  const weekday = new Date().toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
-  const list = days[weekday] || [];
-  list.forEach((task, idx) => {
-    if ((task.priority || '').toLowerCase() === priority.toLowerCase()) {
-      if (shouldNotifyTaskWeekly(task, notifyGapMinutes)) {
-        notifyUser(`${capitalize(priority)} priority: ${task.description || 'Task'}`, `Time: ${task.start || ''} - ${task.end || ''}`);
-        markWeeklyTaskNotified(weekday, idx);
-      }
     }
-  });
-}
 
-function shouldNotifyCalendarTask(task, minGapMinutes = 2) {
-  if (!task) return false;
-  if (task.acknowledged) return false;
-  if (!task.lastNotified) return true;
-  const last = new Date(task.lastNotified);
-  const diffMin = (Date.now() - last.getTime()) / 60000;
-  return diffMin >= minGapMinutes;
-}
+    closeBtn.onclick = () => {
+      modal.style.display = 'none';
+      modal.setAttribute('aria-hidden', 'true');
+    };
 
-function markCalendarTaskNotified(dateISO, idx) {
-  if (!calendarTasks[dateISO] || !calendarTasks[dateISO][idx]) return;
-  calendarTasks[dateISO][idx].lastNotified = new Date().toISOString();
-  saveCalendarTasks(calendarTasks);
-}
+    window.addEventListener('click', e => {
+      if (e.target === modal) {
+        modal.style.display = 'none';
+        modal.setAttribute('aria-hidden', 'true');
+      }
+    });
 
-function checkCalendarTasksForPriority(priority, notifyGapMinutes) {
-  if (!loggedInUser) return;
-  const today = new Date().toISOString().split('T')[0];
-  const list = calendarTasks[today] || [];
-  list.forEach((task, idx) => {
-    if ((task.priority || 'medium').toLowerCase() === priority.toLowerCase()) {
-      if (shouldNotifyCalendarTask(task, notifyGapMinutes)) {
-        notifyUser(`${capitalize(priority)} calendar task: ${task.title || 'Task'}`, `${task.description || ''}`);
-        // mark notified so it won't immediately repeat
-        calendarTasks[today][idx].lastNotified = new Date().toISOString();
+    smallSave.addEventListener('click', () => {
+      if (!smallSelected) return alert('Please select a date first.');
+      const title = smallEventText.value.trim();
+      const desc = '';
+      const priority = smallPriority.value || 'medium';
+      const oneTime = !!smallOneTime.checked;
+      if (!title) return alert('Enter a title for the plan.');
+
+      if (!calendarTasks[smallSelected]) calendarTasks[smallSelected] = [];
+      calendarTasks[smallSelected].push({ title, description: desc, priority, oneTime, createdAt: new Date().toISOString(), acknowledged: false, lastNotified: null });
+      saveCalendarTasks(calendarTasks);
+      smallEventText.value = '';
+      renderSmallPlans();
+      renderSmallCalendar();
+      buildCalendar(parseInt(monthSelect.value, 10));
+    });
+
+    const retentionDays = 30;
+
+    function dailyCleanup() {
+      try {
+        const cutoff = Date.now() - retentionDays * 24 * 60 * 60 * 1000;
+        Object.keys(calendarTasks).forEach(dateISO => {
+          const arr = calendarTasks[dateISO];
+          const kept = arr.filter(t => {
+            if (!t.createdAt) return true;
+            return new Date(t.createdAt).getTime() >= cutoff;
+          });
+          if (kept.length) {
+            calendarTasks[dateISO] = kept;
+          } else {
+            delete calendarTasks[dateISO];
+          }
+        });
         saveCalendarTasks(calendarTasks);
+
+        Object.keys(days).forEach(day => {
+          days[day] = (days[day] || []).filter(t => {
+            if (!t.oneTime) return true;
+            if (!t.createdAt) return true;
+            return new Date(t.createdAt).getTime() >= cutoff;
+          });
+        });
+        saveWeeklyTasks(days);
+
+        buildCalendar(parseInt(monthSelect.value, 10));
+        updateTaskList(currentDayText.textContent.toLowerCase());
+      } catch (e) {
+        console.error('Daily cleanup failed', e);
       }
     }
-  });
-}
 
-async function startNotificationService() {
-  const ok = await requestNotificationPermission();
-  if (!ok) {
-    console.warn('⚠️ Notifications permission not granted.');
-    return;
-  }
-  console.log('✅ Notification permission granted. Starting notification service...');
-  stopNotificationService();
-
-  // ✅ FIX: Updated intervals - High = 20 sec, Medium = 2 min, Low = 5 min
-  // High priority: every 20 seconds
-  notifIntervals.push(setInterval(() => checkWeeklyTasksForPriority('high', 0.33), 20 * 1000)); // 20 sec
-  notifIntervals.push(setInterval(() => checkCalendarTasksForPriority('high', 0.33), 20 * 1000));
-
-  // Medium priority: every 2 minutes
-  notifIntervals.push(setInterval(() => checkWeeklyTasksForPriority('medium', 2), 2 * 60 * 1000)); // 2 min
-  notifIntervals.push(setInterval(() => checkCalendarTasksForPriority('medium', 2), 2 * 60 * 1000));
-
-  // Low priority: every 5 minutes
-  notifIntervals.push(setInterval(() => checkWeeklyTasksForPriority('low', 5), 5 * 60 * 1000)); // 5 min
-  notifIntervals.push(setInterval(() => checkCalendarTasksForPriority('low', 5), 5 * 60 * 1000));
-
-  // immediate check on startup
-  console.log('✅ Running immediate notification checks...');
-  checkWeeklyTasksForPriority('high', 0.33);
-  checkCalendarTasksForPriority('high', 0.33);
-  checkWeeklyTasksForPriority('medium', 2);
-  checkCalendarTasksForPriority('medium', 2);
-  checkWeeklyTasksForPriority('low', 5);
-  checkCalendarTasksForPriority('low', 5);
-  console.log('✅ Notification intervals set - High: 20s, Medium: 2min, Low: 5min');
-}
-
-function stopNotificationService() {
-  console.log('⏸️ Stopping notification service...');
-  notifIntervals.forEach(i => clearInterval(i));
-  notifIntervals = [];
-}
-
-// expose login/logout functions globally so other windows can call them
-window.onUserLogin = function(username) {
-  onUserLogin(username);
-};
-window.onUserLogout = function() {
-  onUserLogout();
-};
-
-// Cross-tab coordination:
-// 1) Listen for storage events (fires in other tabs when localStorage changes)
-window.addEventListener('storage', (e) => {
-  if (e.key === LOGGED_USER_KEY) {
-    if (e.newValue === null) {
-      // ✅ Logged out in another tab
-      console.log('📡 Storage event: User logged out in another tab');
-      try { onUserLogout(); } catch (err) { console.warn('onUserLogout error', err); }
-    } else {
-      // ✅ FIX: LOGIN detected in another tab - start notifications
-      console.log('📡 Storage event: User logged in in another tab:', e.newValue);
-      try { onUserLogin(e.newValue); } catch (err) { console.warn('onUserLogin error', err); }
+    function scheduleDailyCleanup() {
+      dailyCleanup();
+      const now = new Date();
+      const nextMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+      const msUntil = nextMidnight - now;
+      setTimeout(() => {
+        dailyCleanup();
+        setInterval(dailyCleanup, 24 * 60 * 60 * 1000);
+      }, msUntil);
     }
-  }
-});
 
-// 2) BroadcastChannel for immediate messaging (if supported)
-let bc = null;
-try {
-  bc = new BroadcastChannel('schedule_planner_channel');
-  bc.addEventListener('message', (ev) => {
-    const msg = ev.data;
-    if (!msg || !msg.type) return;
-    console.log('📡 BroadcastChannel message received:', msg.type);
-    if (msg.type === 'logout') {
-      try { onUserLogout(); } catch (err) { console.warn('onUserLogout error', err); }
-    } else if (msg.type === 'login' && msg.username) {
-      console.log('✅ Login signal received for user:', msg.username);
-      try { onUserLogin(msg.username); } catch (err) { console.warn('onUserLogin error', err); }
+    let notifIntervals = [];
+    let loggedInUser = localStorage.getItem(LOGGED_USER_KEY) || null;
+
+    function onUserLogin(username) {
+      loggedInUser = username;
+      localStorage.setItem(LOGGED_USER_KEY, username);
+      startNotificationService();
     }
-  });
-  console.log('✅ BroadcastChannel "schedule_planner_channel" connected');
-} catch (e) {
-  console.warn('⚠️ BroadcastChannel unavailable in this browser', e);
-}
 
-// Helper: allow Homepage to call planner.stop via opener reference (best-effort)
-try {
-  if (window.opener && typeof window.opener.postMessage === 'function') {
-    // no-op; Homepage attempts direct window.opener.onUserLogout() when it has a ref
-  }
-} catch (e) {
-  // ignore cross-origin access errors
-}
+    function onUserLogout() {
+      loggedInUser = null;
+      localStorage.removeItem(LOGGED_USER_KEY);
+      stopNotificationService();
+    }
 
-// Final init
-function init() {
-  if (!monthSelect.value) monthSelect.value = String(new Date().getMonth());
-  buildCalendar(parseInt(monthSelect.value, 10));
+    async function requestNotificationPermission() {
+      if (!('Notification' in window)) return false;
+      if (Notification.permission === 'granted') return true;
+      if (Notification.permission === 'denied') return false;
+      const result = await Notification.requestPermission();
+      return result === 'granted';
+    }
 
-  days = loadWeeklyTasks();
-  calendarTasks = loadCalendarTasks();
+    function notifyUser(title, body) {
+      if (Notification.permission !== 'granted') return;
+      try {
+        new Notification(title, { body, icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y="75" font-size="75">📅</text></svg>', tag: 'schedule-planner-notification' });
+      } catch (e) {
+        console.error('Notification failed', e);
+      }
+    }
 
-  currentDayText.textContent = 'Monday';
-  tasksDayText.textContent = 'Monday';
-  updateTaskList('monday');
+    function markWeeklyTaskNotified(day, index) {
+      const list = days[day];
+      if (!list || !list[index]) return;
+      list[index].lastNotified = new Date().toISOString();
+      saveWeeklyTasks(days);
+    }
 
-  scheduleDailyCleanup();
+    function shouldNotifyTaskWeekly(task, minGapMinutes = 2) {
+      if (!task || task.acknowledged) return false;
+      if (!task.lastNotified) return true;
+      const last = new Date(task.lastNotified);
+      const diffMin = (Date.now() - last.getTime()) / 60000;
+      return diffMin >= minGapMinutes;
+    }
 
-  // ✅ FIX: start notifications automatically if user already logged in
-  const storedUser = localStorage.getItem(LOGGED_USER_KEY);
-  if (storedUser) {
-    loggedInUser = storedUser;
-    console.log('✅ User already logged in:', loggedInUser);
-    console.log('🔔 Auto-starting notification service...');
-    startNotificationService();
-  } else {
-    console.log('ℹ️ No user logged in yet');
-  }
-}
+    function checkWeeklyTasksForPriority(priority, notifyGapMinutes) {
+      if (!loggedInUser) return;
+      const weekday = new Date().toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
+      const list = days[weekday] || [];
+      list.forEach((task, idx) => {
+        if ((task.priority || '').toLowerCase() === priority.toLowerCase()) {
+          if (shouldNotifyTaskWeekly(task, notifyGapMinutes)) {
+            notifyUser(`${capitalize(priority)} priority: ${task.description || 'Task'}`, `Time: ${task.start || ''} - ${task.end || ''}`);
+            markWeeklyTaskNotified(weekday, idx);
+          }
+        }
+      });
+    }
 
-init();
-</script>
+    function shouldNotifyCalendarTask(task, minGapMinutes = 2) {
+      if (!task || task.acknowledged) return false;
+      if (!task.lastNotified) return true;
+      const last = new Date(task.lastNotified);
+      const diffMin = (Date.now() - last.getTime()) / 60000;
+      return diffMin >= minGapMinutes;
+    }
+
+    function markCalendarTaskNotified(dateISO, idx) {
+      if (!calendarTasks[dateISO] || !calendarTasks[dateISO][idx]) return;
+      calendarTasks[dateISO][idx].lastNotified = new Date().toISOString();
+      saveCalendarTasks(calendarTasks);
+    }
+
+    function checkCalendarTasksForPriority(priority, notifyGapMinutes) {
+      if (!loggedInUser) return;
+      const today = new Date().toISOString().split('T')[0];
+      const list = calendarTasks[today] || [];
+      list.forEach((task, idx) => {
+        if ((task.priority || 'medium').toLowerCase() === priority.toLowerCase()) {
+          if (shouldNotifyCalendarTask(task, notifyGapMinutes)) {
+            notifyUser(`${capitalize(priority)} calendar task: ${task.title || 'Task'}`, `${task.description || ''}`);
+            calendarTasks[today][idx].lastNotified = new Date().toISOString();
+            saveCalendarTasks(calendarTasks);
+          }
+        }
+      });
+    }
+
+    async function startNotificationService() {
+      const ok = await requestNotificationPermission();
+      if (!ok) return;
+      stopNotificationService();
+
+      notifIntervals.push(setInterval(() => checkWeeklyTasksForPriority('high', 0.33), 20 * 1000));
+      notifIntervals.push(setInterval(() => checkCalendarTasksForPriority('high', 0.33), 20 * 1000));
+      notifIntervals.push(setInterval(() => checkWeeklyTasksForPriority('medium', 2), 2 * 60 * 1000));
+      notifIntervals.push(setInterval(() => checkCalendarTasksForPriority('medium', 2), 2 * 60 * 1000));
+      notifIntervals.push(setInterval(() => checkWeeklyTasksForPriority('low', 5), 5 * 60 * 1000));
+      notifIntervals.push(setInterval(() => checkCalendarTasksForPriority('low', 5), 5 * 60 * 1000));
+
+      checkWeeklyTasksForPriority('high', 0.33);
+      checkCalendarTasksForPriority('high', 0.33);
+      checkWeeklyTasksForPriority('medium', 2);
+      checkCalendarTasksForPriority('medium', 2);
+      checkWeeklyTasksForPriority('low', 5);
+      checkCalendarTasksForPriority('low', 5);
+    }
+
+    function stopNotificationService() {
+      notifIntervals.forEach(i => clearInterval(i));
+      notifIntervals = [];
+    }
+
+    window.onUserLogin = function(username) { onUserLogin(username); };
+    window.onUserLogout = function() { onUserLogout(); };
+
+    window.addEventListener('storage', (e) => {
+      if (e.key === LOGGED_USER_KEY) {
+        if (e.newValue === null) {
+          try { onUserLogout(); } catch (err) { }
+        } else {
+          try { onUserLogin(e.newValue); } catch (err) { }
+        }
+      }
+    });
+
+    // Initialize
+    scheduleDailyCleanup();
+    buildCalendar(parseInt(monthSelect.value, 10));
+    updateTaskList('monday');
+    document.querySelectorAll('.day-button')[0].style.boxShadow = '0 4px 12px rgba(102, 126, 234, 0.3)';
+  </script>
 </body>
 </html>
