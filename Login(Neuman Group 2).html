@@ -1,149 +1,185 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Login - Schedule Planner</title>
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    html, body { height: 100%; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f7fa; }
-    body { display: flex; justify-content: stretch; align-items: stretch; min-height: 100vh; }
+<!DOCTYPE html>  <html lang="en">  
+<head>  
+  <meta charset="UTF-8" />  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />  
+  <title>Login - Schedule Planner</title>  
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />  
+  <style>  
+    * { margin: 0; padding: 0; box-sizing: border-box; }  
+    html, body { height: 100%; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f7fa; }  
+    body { display: flex; justify-content: stretch; align-items: stretch; min-height: 100vh; }  /* LEFT SIDE - MARKETING */  
+.left-side { flex: 1; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; padding: 60px 40px; position: relative; overflow: hidden; }  
+.left-side::before { content: ''; position: absolute; width: 400px; height: 400px; background: rgba(255, 255, 255, 0.1); border-radius: 50%; top: -100px; left: -100px; animation: float 20s ease-in-out infinite; }  
+.left-side::after { content: ''; position: absolute; width: 300px; height: 300px; background: rgba(255, 255, 255, 0.08); border-radius: 50%; bottom: -50px; right: -100px; animation: float 25s ease-in-out infinite reverse; }  
+@keyframes float { 0%,100% { transform: translateY(0px); } 50% { transform: translateY(30px); } }  
+.left-content { position: relative; z-index: 2; text-align: center; max-width: 400px; }  
+.brand-logo { font-size: 72px; margin-bottom: 25px; display: inline-block; background: rgba(255,255,255,0.2); padding: 30px; border-radius: 20px; backdrop-filter: blur(10px); }  
+.left-side h1 { font-size: 42px; font-weight: 700; margin-bottom: 20px; letter-spacing: -1px; }  
+.left-side p { font-size: 18px; line-height: 1.6; color: rgba(255,255,255,0.9); margin-bottom: 30px; }  
+.features { display: flex; flex-direction: column; gap: 15px; align-items: flex-start; margin-top: 40px; }  
+.feature-item { display: flex; align-items: center; gap: 12px; font-size: 15px; }  
+.feature-item i { font-size: 20px; background: rgba(255,255,255,0.2); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }  
 
-    .left-side { flex: 1; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; padding: 60px 40px; position: relative; overflow: hidden; }
-    .left-content { position: relative; z-index: 2; text-align: center; max-width: 400px; }
-    .brand-logo { font-size: 72px; margin-bottom: 25px; display: inline-block; background: rgba(255,255,255,0.2); padding: 30px; border-radius: 20px; backdrop-filter: blur(10px); }
+/* RIGHT SIDE - LOGIN/SIGNUP FORM */  
+.right-side { flex: 1; display: flex; justify-content: center; align-items: center; padding: 40px; background: #f5f7fa; }  
+.login-container { background: white; padding: 50px 40px; border-radius: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.1); width: 100%; max-width: 450px; animation: slideIn 0.6s ease-out; }  
+@keyframes slideIn { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }  
+.login-header { text-align: center; margin-bottom: 35px; }  
+.login-logo { font-size: 48px; margin-bottom: 15px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }  
+.login-container h2 { font-size: 28px; font-weight: 700; color: #333; margin-bottom: 8px; }  
+.login-subtitle { color: #999; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; }  
+.form-group { margin-bottom: 22px; }  
+label { display: block; margin-bottom: 8px; font-weight: 600; color: #333; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px; }  
+input[type="text"], input[type="password"] { width: 100%; padding: 14px 16px; border: 2px solid #e0e0e0; border-radius: 12px; font-size: 16px; transition: all 0.3s ease; background: #f8f9fa; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }  
+input[type="text"]:focus, input[type="password"]:focus { outline: none; border-color: #667eea; background: white; box-shadow: 0 0 0 3px rgba(102,126,234,0.1); }  
+input[type="submit"] { width: 100%; background: linear-gradient(135deg,#667eea 0%,#764ba2 100%); color: white; padding: 14px 20px; border: none; border-radius: 12px; cursor: pointer; font-weight: 600; font-size: 16px; transition: all 0.3s ease; text-transform: uppercase; letter-spacing: 0.5px; box-shadow: 0 8px 20px rgba(102,126,234,0.3); margin-top: 10px; }  
+input[type="submit"]:hover { transform: translateY(-3px); box-shadow: 0 12px 30px rgba(102,126,234,0.4); }  
+input[type="submit"]:active { transform: translateY(-1px); }  
+.form-footer { text-align: center; margin-top: 20px; font-size: 14px; color: #666; }  
+.form-footer a { color: #667eea; text-decoration: none; font-weight: 600; transition: color 0.3s ease; cursor: pointer; }  
+.form-footer a:hover { color: #764ba2; text-decoration: underline; }  
+#message { margin-top: 15px; padding: 12px 14px; border-radius: 10px; text-align: center; font-weight: 600; font-size: 14px; display: none; animation: slideDown 0.4s ease-out; }  
+@keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }  
+.success-message { background: rgba(46,204,113,0.1); color: #27ae60; border-left: 3px solid #27ae60; }  
+.error-message { background: rgba(231,76,60,0.1); color: #e74c3c; border-left: 3px solid #e74c3c; }  
 
-    .right-side { flex: 1; display: flex; justify-content: center; align-items: center; padding: 40px; background: #f5f7fa; }
-    .login-container { background: white; padding: 50px 40px; border-radius: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.1); width: 100%; max-width: 450px; }
+@media (max-width:768px){body{flex-direction:column;}.features{display:none;}}
 
-    .login-header { text-align: center; margin-bottom: 35px; }
-    .login-container h2 { font-size: 28px; font-weight: 700; color: #333; margin-bottom: 8px; }
+  </style>  
+</head>  
+<body>  
+  <div class="left-side">  
+    <div class="left-content">  
+      <div class="brand-logo"><i class="fas fa-calendar-check"></i></div>  
+      <h1>Schedule Planner</h1>  
+      <p>Take control of your time and boost your productivity</p>  
+    </div>  
+  </div>    <div class="right-side">  
+    <div class="login-container">  
+      <div class="login-header">  
+        <div class="login-logo"><i class="fas fa-calendar-check"></i></div>  
+        <h2 id="formTitle">Login</h2>  
+        <p class="login-subtitle" id="formSubtitle">Login to your account</p>  
+      </div>  <!-- LOGIN FORM -->  
+  <form id="loginForm" onsubmit="return checkLogin()">  
+    <div class="form-group">  
+      <label for="loginUsername">Username</label>  
+      <input type="text" id="loginUsername" name="username" placeholder="Enter your username" required>  
+    </div>  
+    <div class="form-group">  
+      <label for="loginPassword">Password</label>  
+      <input type="password" id="loginPassword" name="password" placeholder="Enter your password" required>  
+    </div>  
+    <input type="submit" value="Login">  
+  </form>  
 
-    .form-group { margin-bottom: 22px; }
+  <!-- SIGNUP FORM -->  
+  <form id="signupForm" onsubmit="return signUp()" style="display:none;">  
+    <div class="form-group">  
+      <label for="signupUsername">Username</label>  
+      <input type="text" id="signupUsername" name="username" placeholder="Enter your username" required>  
+    </div>  
+    <div class="form-group">  
+      <label for="signupPassword">Password</label>  
+      <input type="password" id="signupPassword" name="password" placeholder="Enter password" required>  
+    </div>  
+    <div class="form-group">  
+      <label for="signupConfirmPassword">Confirm Password</label>  
+      <input type="password" id="signupConfirmPassword" name="confirmPassword" placeholder="Confirm password" required>  
+    </div>  
+    <input type="submit" value="Sign Up">  
+  </form>  
 
-    label { display: block; margin-bottom: 8px; font-weight: 600; color: #333; }
-
-    input[type="text"], input[type="password"] {
-      width: 100%;
-      padding: 14px 16px;
-      border: 2px solid #e0e0e0;
-      border-radius: 12px;
-      font-size: 16px;
-    }
-
-    input[type="submit"] {
-      width: 100%;
-      background: linear-gradient(135deg,#667eea 0%,#764ba2 100%);
-      color: white;
-      padding: 14px 20px;
-      border: none;
-      border-radius: 12px;
-      cursor: pointer;
-      font-weight: 600;
-      font-size: 16px;
-    }
-
-    #message { margin-top: 15px; padding: 12px 14px; border-radius: 10px; text-align: center; font-weight: 600; font-size: 14px; display: none; }
-
-    .success-message { background: rgba(46,204,113,0.1); color: #27ae60; border-left: 3px solid #27ae60; }
-    .error-message { background: rgba(231,76,60,0.1); color: #e74c3c; border-left: 3px solid #e74c3c; }
-  </style>
-</head>
-<body>
-
-<div class="right-side">
-  <div class="login-container">
-
-    <div class="login-header">
-      <h2>Login</h2>
-    </div>
-
-    <!-- LOGIN FORM -->
-    <form id="loginForm">
-      <div class="form-group">
-        <label>Username</label>
-        <input type="text" id="loginUsername" required>
-      </div>
-
-      <div class="form-group">
-        <label>Password</label>
-        <input type="password" id="loginPassword" required>
-      </div>
-
-      <input type="submit" value="Login">
-    </form>
-
-    <p id="message"></p>
-
-  </div>
+  <p id="message"></p>  
+  <div class="form-footer">  
+    <span id="toggleText">Don't have an account? </span>  
+    <a id="toggleLink" onclick="toggleForm()">Sign Up</a>  
+  </div>  
 </div>
 
-<script>
-
-const LOGGED_USER_KEY='loggedInUser_v1';
-const USERS_KEY='users_v1';
-
-async function hashPassword(password){
-  const data=new TextEncoder().encode(password);
-  const hash=await crypto.subtle.digest('SHA-256',data);
-  return Array.from(new Uint8Array(hash)).map(b=>b.toString(16).padStart(2,'0')).join('');
-}
-
-function getStoredUsers(){
-  try { return JSON.parse(localStorage.getItem(USERS_KEY)||'{}'); }
-  catch { return {}; }
-}
-
-function saveUsers(users){
-  localStorage.setItem(USERS_KEY,JSON.stringify(users));
-}
-
-/* FIX #2 — Proper form submit handling */
-document.getElementById("loginForm").addEventListener("submit", async function(e){
-  e.preventDefault();
-  await checkLogin();
-});
-
-async function checkLogin(){
-
-  const user=document.getElementById('loginUsername').value.trim();
-  const pass=document.getElementById('loginPassword').value;
-  const users=getStoredUsers();
-
-  if(!users[user]){
-    showError('User does not exist');
-    return;
-  }
-
-  const hashedInput=await hashPassword(pass);
-
-  if(users[user]===hashedInput){
-    localStorage.setItem(LOGGED_USER_KEY,user);
-    showSuccess('✓ Login successful! Redirecting...');
-    setTimeout(()=>window.location.href='Homepage(Neuman Group 2).html',1200);
-  } 
-  else{
-    showError('✗ Incorrect password');
-  }
-}
-
-function showSuccess(text){
-  const msg=document.getElementById('message');
-  msg.classList.remove('error-message');
-  msg.classList.add('success-message');
-  msg.textContent=text;
-  msg.style.display='block';
-}
-
-function showError(text){
-  const msg=document.getElementById('message');
-  msg.classList.remove('success-message');
-  msg.classList.add('error-message');
-  msg.textContent=text;
-  msg.style.display='block';
-}
-
-</script>
-</body>
+  </div>  <script>  
+const LOGGED_USER_KEY='loggedInUser_v1';  
+const USERS_KEY='users_v1';  
+  
+async function hashPassword(password){  
+  const data=new TextEncoder().encode(password);  
+  const hash=await crypto.subtle.digest('SHA-256',data);  
+  return Array.from(new Uint8Array(hash)).map(b=>b.toString(16).padStart(2,'0')).join('');  
+}  
+  
+function getStoredUsers(){ try { return JSON.parse(localStorage.getItem(USERS_KEY)||'{}'); } catch { return {}; } }  
+function saveUsers(users){ localStorage.setItem(USERS_KEY,JSON.stringify(users)); }  
+  
+function toggleForm(){  
+  const loginForm=document.getElementById('loginForm');  
+  const signupForm=document.getElementById('signupForm');  
+  const title=document.getElementById('formTitle');  
+  const subtitle=document.getElementById('formSubtitle');  
+  const toggleText=document.getElementById('toggleText');  
+  const toggleLink=document.getElementById('toggleLink');  
+  const message=document.getElementById('message');  
+  
+  message.style.display='none';  
+  
+  if(loginForm.style.display==='none'){  
+    loginForm.style.display='block';  
+    signupForm.style.display='none';  
+    title.textContent='Login';  
+    subtitle.textContent='Login to your account';  
+    toggleText.textContent="Don't have an account? ";  
+    toggleLink.textContent='Sign Up';  
+  } else {  
+    loginForm.style.display='none';  
+    signupForm.style.display='block';  
+    title.textContent='Sign Up';  
+    subtitle.textContent='Create a new account';  
+    toggleText.textContent='Already have an account? ';  
+    toggleLink.textContent='Login';  
+  }  
+}  
+  
+async function checkLogin(){  
+  const user=document.getElementById('loginUsername').value.trim();  
+  const pass=document.getElementById('loginPassword').value;  
+  const users=getStoredUsers();  
+  
+  if(!users[user]) return showError('User does not exist');  
+  
+  const hashedInput=await hashPassword(pass);  
+  if(users[user]===hashedInput){  
+    localStorage.setItem(LOGGED_USER_KEY,user);  
+    showSuccess('✓ Login successful! Redirecting...');  
+    setTimeout(()=>window.location.href='Homepage(Neuman Group 2).html',1200);  
+  } else showError('✗ Incorrect password');  
+  return false;  
+}  
+  
+async function signUp(){  
+  const user=document.getElementById('signupUsername').value.trim();  
+  const pass=document.getElementById('signupPassword').value;  
+  const confirmPass=document.getElementById('signupConfirmPassword').value;  
+  const users=getStoredUsers();  
+  
+  if(user.length<3) return showError('Username must be at least 3 characters');  
+  if(pass.length<4) return showError('Password must be at least 4 characters');  
+  if(pass!==confirmPass) return showError('Passwords do not match');  
+  if(users[user]) return showError('Username already exists');  
+  
+  users[user]=await hashPassword(pass);  
+  saveUsers(users);  
+  showSuccess('✓ Account created! You can now login.');  
+  toggleForm();  
+  return false;  
+}  
+  
+function showSuccess(text){  
+  const msg=document.getElementById('message');  
+  msg.classList.remove('error-message'); msg.classList.add('success-message'); msg.textContent=text; msg.style.display='block';  
+}  
+  
+function showError(text){  
+  const msg=document.getElementById('message');  
+  msg.classList.remove('success-message'); msg.classList.add('error-message'); msg.textContent=text; msg.style.display='block';  
+}  
+</script>  </body>  
 </html>
