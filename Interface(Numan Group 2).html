@@ -77,7 +77,7 @@
 
     header h1 {
       margin: 0;
-      font-size: 24px;
+      font-size: 17px;
       font-weight: 700;
       letter-spacing: -0.5px;
     }
@@ -707,6 +707,10 @@
       display: block;
     }
 
+    #calPrev:hover, #calNext:hover {
+      background: rgba(255,255,255,0.35) !important;
+    }
+
     /* Scrollbar Styling */
     ::-webkit-scrollbar {
       width: 8px;
@@ -896,23 +900,7 @@
         </div>
       </div>
 
-      <div class="month-selector">
-        <h3><i class="fas fa-calendar-alt"></i> Select Month</h3>
-        <select id="monthSelect">
-          <option value="0">January</option>
-          <option value="1">February</option>
-          <option value="2">March</option>
-          <option value="3">April</option>
-          <option value="4">May</option>
-          <option value="5">June</option>
-          <option value="6">July</option>
-          <option value="7">August</option>
-          <option value="8">September</option>
-          <option value="9">October</option>
-          <option value="10">November</option>
-          <option value="11">December</option>
-        </select>
-      </div>
+      <!-- month selector removed -->
     </div>
 
     <!-- Main Content -->
@@ -920,6 +908,7 @@
       <!-- Form Section -->
       <div style="flex: 1; display: flex; flex-direction: column; gap: 20px;">
         <div>
+          <p style="color: rgba(255,255,255,0.75); font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin: 0 0 4px 0;"><i class="fas fa-calendar-check"></i> Weekly Schedule Planner</p>
           <h2><i class="fas fa-plus-circle"></i> Add Task for <span id="current-day">Monday</span></h2>
         </div>
 
@@ -973,8 +962,10 @@
         <h2 style="margin-bottom: 15px;"><i class="fas fa-calendar"></i> Calendar View</h2>
         <main>
           <div class="calendar">
-            <div class="calendar-header">
+            <div class="calendar-header" style="display:flex; align-items:center; justify-content:space-between; padding: 15px 20px;">
+              <button id="calPrev" aria-label="Previous month" style="background:rgba(255,255,255,0.2); color:white; border:none; border-radius:8px; padding:8px 14px; font-size:18px; cursor:pointer; font-weight:700; width:auto; box-shadow:none; transition: background 0.2s;">&#8249;</button>
               <h2 id="calendarTitle" style="margin: 0; font-size: 18px;">October 2026</h2>
+              <button id="calNext" aria-label="Next month" style="background:rgba(255,255,255,0.2); color:white; border:none; border-radius:8px; padding:8px 14px; font-size:18px; cursor:pointer; font-weight:700; width:auto; box-shadow:none; transition: background 0.2s;">&#8250;</button>
             </div>
             <table id="calendarTable">
               <thead>
@@ -1152,15 +1143,37 @@
       e.target.reset();
     });
 
-    const monthSelect = document.getElementById("monthSelect");
+    // Hidden monthSelect shim for compatibility (no longer in DOM)
+    let currentMonth = new Date().getMonth();
+    const monthSelect = {
+      value: String(currentMonth),
+      options: [
+        {text:'January'},{text:'February'},{text:'March'},{text:'April'},
+        {text:'May'},{text:'June'},{text:'July'},{text:'August'},
+        {text:'September'},{text:'October'},{text:'November'},{text:'December'}
+      ],
+      addEventListener: function() {}
+    };
     const calendarTitle = document.getElementById("calendarTitle");
     const calendarTable = document.getElementById("calendarTable");
     let currentYear = new Date().getFullYear();
     const todayISO = new Date().toISOString().split('T')[0];
 
-    monthSelect.value = String(new Date().getMonth());
+    monthSelect.value = String(currentMonth);
 
-    function buildCalendar(month) {
+    document.getElementById('calPrev').addEventListener('click', () => {
+      currentMonth--;
+      if (currentMonth < 0) { currentMonth = 11; currentYear--; }
+      monthSelect.value = String(currentMonth);
+      buildCalendar(currentMonth);
+    });
+
+    document.getElementById('calNext').addEventListener('click', () => {
+      currentMonth++;
+      if (currentMonth > 11) { currentMonth = 0; currentYear++; }
+      monthSelect.value = String(currentMonth);
+      buildCalendar(currentMonth);
+    });    function buildCalendar(month) {
       const year = currentYear;
       const monthName = monthSelect.options[month].text;
       calendarTitle.textContent = `${monthName} ${year}`;
@@ -1212,7 +1225,7 @@
       }
     }
 
-    monthSelect.addEventListener("change", e => buildCalendar(parseInt(e.target.value, 10)));
+    // month nav handled by calPrev/calNext above
 
     calendarTable.addEventListener("click", e => {
       const td = e.target.closest('td');
@@ -1306,7 +1319,7 @@
           calendarTasks[smallSelected][idx].acknowledged = true;
           saveCalendarTasks(calendarTasks);
           renderSmallPlans();
-          buildCalendar(parseInt(monthSelect.value, 10));
+          buildCalendar(currentMonth);
         };
 
         const delBtn = document.createElement('button');
@@ -1319,7 +1332,7 @@
           if (!calendarTasks[smallSelected].length) delete calendarTasks[smallSelected];
           saveCalendarTasks(calendarTasks);
           renderSmallPlans();
-          buildCalendar(parseInt(monthSelect.value, 10));
+          buildCalendar(currentMonth);
         };
 
         right.appendChild(ackBtn);
@@ -1387,7 +1400,7 @@
       smallEventText.value = '';
       renderSmallPlans();
       renderSmallCalendar();
-      buildCalendar(parseInt(monthSelect.value, 10));
+      buildCalendar(currentMonth);
     });
 
     const retentionDays = 30;
@@ -1418,7 +1431,7 @@
         });
         saveWeeklyTasks(days);
 
-        buildCalendar(parseInt(monthSelect.value, 10));
+        buildCalendar(currentMonth);
         updateTaskList(currentDayText.textContent.toLowerCase());
       } catch (e) {
         console.error('Daily cleanup failed', e);
@@ -1566,7 +1579,7 @@
 
     // Initialize
     scheduleDailyCleanup();
-    buildCalendar(parseInt(monthSelect.value, 10));
+    buildCalendar(currentMonth);
     updateTaskList('monday');
     document.querySelectorAll('.day-button')[0].style.boxShadow = '0 4px 12px rgba(102, 126, 234, 0.3)';
   </script>
