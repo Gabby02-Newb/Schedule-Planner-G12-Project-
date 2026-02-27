@@ -61,7 +61,7 @@ input[type="submit"]:active { transform: translateY(-1px); }
         <h2 id="formTitle">Login</h2>  
         <p class="login-subtitle" id="formSubtitle">Login to your account</p>  
       </div>  <!-- LOGIN FORM -->  
-  <form id="loginForm" onsubmit="return checkLogin()">  
+  <form id="loginForm" onsubmit="checkLogin(event)">  
     <div class="form-group">  
       <label for="loginUsername">Username</label>  
       <input type="text" id="loginUsername" name="username" placeholder="Enter your username" required>  
@@ -74,7 +74,7 @@ input[type="submit"]:active { transform: translateY(-1px); }
   </form>  
 
   <!-- SIGNUP FORM -->  
-  <form id="signupForm" onsubmit="return signUp()" style="display:none;">  
+  <form id="signupForm" onsubmit="signUp(event)" style="display:none;">  
     <div class="form-group">  
       <label for="signupUsername">Username</label>  
       <input type="text" id="signupUsername" name="username" placeholder="Enter your username" required>  
@@ -138,7 +138,8 @@ function toggleForm(){
   }  
 }  
   
-async function checkLogin(){  
+async function checkLogin(event){  
+  event.preventDefault();  
   const user=document.getElementById('loginUsername').value.trim();  
   const pass=document.getElementById('loginPassword').value;  
   const users=getStoredUsers();  
@@ -151,10 +152,10 @@ async function checkLogin(){
     showSuccess('✓ Login successful! Redirecting...');  
     setTimeout(()=>window.location.href='Homepage(Neuman Group 2).html',1200);  
   } else showError('✗ Incorrect password');  
-  return false;  
 }  
   
-async function signUp(){  
+async function signUp(event){  
+  event.preventDefault();  
   const user=document.getElementById('signupUsername').value.trim();  
   const pass=document.getElementById('signupPassword').value;  
   const confirmPass=document.getElementById('signupConfirmPassword').value;  
@@ -169,7 +170,6 @@ async function signUp(){
   saveUsers(users);  
   showSuccess('✓ Account created! You can now login.');  
   toggleForm();  
-  return false;  
 }  
   
 function showSuccess(text){  
